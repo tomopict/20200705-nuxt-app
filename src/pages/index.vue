@@ -2,27 +2,20 @@
   <div class="container">
     <div>
       <Logo />
-      <h1 class="title">
-        20200705-nuxt-app
-      </h1>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--green"
-        >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--grey"
-        >
-          GitHub
-        </a>
+      <div class="">
+        <input
+          v-model="inputText"
+          class="border-gray-100 p-3"
+          type="text"
+          placeholder="本日やることはなんですか"
+          @keydown.enter="handleAddToDoList"
+        />
       </div>
+      <div>
+        {{ enterTodo }}
+      </div>
+
+      <div id="todo-list" class="todo-list"></div>
     </div>
   </div>
 </template>
@@ -30,7 +23,25 @@
 <script lang="ts">
 import Vue from 'vue'
 
-export default Vue.extend({})
+export default Vue.extend({
+  data() {
+    return {
+      text: 'tes',
+      inputText: 'aaa',
+    }
+  },
+  mounted() {},
+  methods: {
+    handleAddToDoList() {
+      console.log(this.inputText)
+    },
+  },
+  computed: {
+    enterTodo(): string {
+      return `今日やるのは、${this.inputText}`
+    },
+  },
+})
 </script>
 
 <style>
