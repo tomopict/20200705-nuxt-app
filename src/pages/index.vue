@@ -2,7 +2,7 @@
   <div class="container">
     <div>
       <Logo />
-      <div class="">
+      <div>
         <input
           v-model="inputText"
           class="border-gray-100 p-3"
@@ -11,36 +11,34 @@
           @keydown.enter="handleAddToDoList"
         />
       </div>
-      <div>
-        {{ enterTodo }}
-      </div>
-
-      <div id="todo-list" class="todo-list"></div>
+      <ToDolists id="todo-list" :lists="lists"></ToDolists>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
+import ToDolists from '@/components/molecules/todolists.vue'
 
 export default Vue.extend({
+  components: { ToDolists },
   data() {
     return {
       text: 'tes',
       inputText: 'aaa',
+      lists: [],
     }
   },
   mounted() {},
   methods: {
     handleAddToDoList() {
+      if (!this.inputText) return
       console.log(this.inputText)
+      this.lists.push(this.inputText)
+      this.inputText = ''
     },
   },
-  computed: {
-    enterTodo(): string {
-      return `今日やるのは、${this.inputText}`
-    },
-  },
+  computed: {},
 })
 </script>
 
