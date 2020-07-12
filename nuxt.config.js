@@ -16,7 +16,7 @@ export default {
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
   css: [],
-  plugins: [],
+  plugins: ['~/plugins/firebase'],
   components: true,
   buildModules: [
     '@nuxt/typescript-build',

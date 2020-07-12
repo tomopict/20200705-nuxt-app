@@ -11,6 +11,7 @@
           @keydown.enter="handleAddToDoList"
         />
       </div>
+      <p @click="handleSignIn">singin</p>
       <ToDolists id="todo-list" :lists="lists"></ToDolists>
     </div>
   </div>
@@ -18,6 +19,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import firebase from '~/plugins/firebase'
 import ToDolists from '@/components/molecules/todolists.vue'
 
 export default Vue.extend({
@@ -29,13 +31,58 @@ export default Vue.extend({
       lists: [],
     }
   },
-  mounted() {},
+  mounted() {
+    console.log(process.env.FIREBASE_PROJECT_ID)
+    console.log(process.env.FIREBASE_APP_ID)
+  },
   methods: {
     handleAddToDoList() {
       if (!this.inputText) return
       console.log(this.inputText)
+      console.log(firebase)
+
       this.lists.push(this.inputText)
+      this.handleAddToFirebase(this.inputText)
       this.inputText = ''
+    },
+    handleSignIn() {
+      const provider = new firebase.auth.GoogleAuthProvider()
+
+      firebase
+        .auth()
+        .signInWithRedirect(provider)
+        .then((result: any) => {
+          const token = result.credential.accessToken
+          const user = result.user
+          console.log(token, user, result)
+        })
+        .catch(function (error) {
+          // Handle Errors here.
+          const errorCode = error.code
+          const errorMessage = error.message
+          // The email of the user's account used.
+          const email = error.email
+          // The firebase.auth.AuthCredential type that was used.
+          const credential = error.credential
+          console.error(errorCode, errorMessage, email, credential)
+        })
+
+      firebase.auth().onAuthStateChanged(function (user) {
+        console.log(user)
+      })
+    },
+    handleAddToFirebase(addtodotext: string) {
+      const db = firebase.firestore()
+      db.collection('todo')
+        .add({
+          title: addtodotext,
+        })
+        .then(function (docRef) {
+          console.log('Document written with ID: ', docRef.id)
+        })
+        .catch(function (error) {
+          console.error('Error adding document: ', error)
+        })
     },
   },
   computed: {},
