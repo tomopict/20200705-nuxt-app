@@ -15,6 +15,10 @@ $ yarn start
 
 # generate static project
 $ yarn generate
+
+# run on docker
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
 ```
 
 For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).

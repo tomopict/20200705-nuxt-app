@@ -1,0 +1,4 @@
+version: '3'
+services:
+  nuxt:
+    command: /bin/sh -c "yarn cache clean && yarn install --check-files && yarn dev"

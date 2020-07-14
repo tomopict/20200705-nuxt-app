@@ -1,0 +1,12 @@
+version: '3'
+services:
+  nuxt:
+    image: node:12.16.0
+    working_dir: /var/local/app
+    volumes:
+      - .:/var/local/app:cached
+    environment:
+      - HOST=0.0.0.0
+    ports:
+      - 8080:3000
+    container_name: nuxt-app-test
