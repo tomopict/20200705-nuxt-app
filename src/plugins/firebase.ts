@@ -1,17 +1,72 @@
-import * as firebase from 'firebase/app'
-import 'firebase/firestore'
-import 'firebase/auth'
+import Vue from 'vue'
+import { Plugin } from '@nuxt/types'
+import * as _firebase from 'firebase'
+import * as Firebase from '../utils/externals/firebase'
 
-const config: any = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  databaseURL: process.env.FIREBASE_DATABASE_URL,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.FIREBASE_APP_ID,
+declare module '@nuxt/types' {
+  interface Context {
+    $firebase: typeof _firebase
+    $firestore: firebase.firestore.Firestore
+    $storage: firebase.storage.Storage
+    $functions: firebase.functions.Functions
+    $messaging: firebase.messaging.Messaging
+    $analytics: firebase.analytics.Analytics
+  }
+  interface NuxtAppOptions {
+    $firebase: typeof _firebase
+    $firestore: firebase.firestore.Firestore
+    $storage: firebase.storage.Storage
+    $functions: firebase.functions.Functions
+    $messaging: firebase.messaging.Messaging
+    $analytics: firebase.analytics.Analytics
+  }
 }
-if (!firebase.apps.length) {
-  firebase.initializeApp(config)
+
+declare module 'vue/types/vue' {
+  interface Vue {
+    $auth: firebase.auth.Auth & {
+      user: firebase.User
+      currentUser: firebase.User
+    }
+    $firebase: typeof _firebase
+    $firestore: firebase.firestore.Firestore
+    $storage: firebase.storage.Storage
+    $functions: firebase.functions.Functions
+    $messaging: firebase.messaging.Messaging
+    $analytics: firebase.analytics.Analytics
+  }
 }
-export default firebase
+
+const _auth = (Firebase.auth as any) as firebase.auth.Auth & {
+  __defineGetter__: any
+  _vm: any
+}
+if (!_auth._vm) {
+  _auth._vm = new Vue({
+    data() {
+      return {
+        currentUser: _auth.currentUser !== null ? _auth.currentUser : undefined,
+      }
+    },
+    created() {
+      _auth.onAuthStateChanged((user: any) => {
+        this.currentUser = user
+      })
+    },
+  })
+  _auth.__defineGetter__('currentUser', () => {
+    return _auth._vm.$data.currentUser
+  })
+  _auth.__defineGetter__('user', () => {
+    return _auth._vm.$data.currentUser
+  })
+}
+
+const FirebasePlugin: Plugin = (context, inject) => {
+  inject('firebase', Firebase.firebase)
+  inject('app', Firebase.app)
+  inject('firestore', Firebase.firestore)
+  inject('auth', _auth as firebase.auth.Auth)
+}
+
+export default FirebasePlugin

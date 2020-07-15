@@ -19,7 +19,6 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import firebase from '~/plugins/firebase'
 import ToDolists from '@/components/molecules/todolists.vue'
 
 export default Vue.extend({
@@ -39,16 +38,17 @@ export default Vue.extend({
     handleAddToDoList() {
       if (!this.inputText) return
       console.log(this.inputText)
-      console.log(firebase)
 
       this.lists.push(this.inputText)
       this.handleAddToFirebase(this.inputText)
       this.inputText = ''
     },
     handleSignIn() {
-      const provider = new firebase.auth.GoogleAuthProvider()
+      console.log(this.$firebase.auth.GoogleAuthProvider)
 
-      firebase
+      const provider = new this.$firebase.auth.GoogleAuthProvider()
+
+      this.$firebase
         .auth()
         .signInWithRedirect(provider)
         .then((result: any) => {
@@ -60,19 +60,17 @@ export default Vue.extend({
           // Handle Errors here.
           const errorCode = error.code
           const errorMessage = error.message
-          // The email of the user's account used.
           const email = error.email
-          // The firebase.auth.AuthCredential type that was used.
           const credential = error.credential
           console.error(errorCode, errorMessage, email, credential)
         })
 
-      firebase.auth().onAuthStateChanged(function (user) {
+      this.$firebase.auth().onAuthStateChanged(function (user) {
         console.log(user)
       })
     },
     handleAddToFirebase(addtodotext: string) {
-      const db = firebase.firestore()
+      const db = this.$firebase.firestore()
       db.collection('todo')
         .add({
           title: addtodotext,
