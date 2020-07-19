@@ -1,17 +1,18 @@
 <template>
   <div class="container">
+    <CommonHeader :userName="userName" :photoUrl="'aaa'"></CommonHeader>
     <div>
-      <Logo />
       <div>
         <input
           v-model="inputText"
           class="border-gray-100 p-3"
           type="text"
-          placeholder="本日やることはなんですか"
+          placeholder="買うもの"
           @keydown.enter="handleAddToDoList"
         />
       </div>
       <p @click="handleSignIn">singin</p>
+      <p @click="handleSignOut">singout</p>
       <ToDolists id="todo-list" :lists="lists"></ToDolists>
     </div>
   </div>
@@ -19,15 +20,17 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import CommonHeader from '@/components/molecules/commonHeader.vue'
 import ToDolists from '@/components/molecules/todolists.vue'
 
 export default Vue.extend({
-  components: { ToDolists },
+  components: { ToDolists, CommonHeader },
   data() {
     return {
       text: 'tes',
       inputText: 'aaa',
       lists: [],
+      userName: '',
     }
   },
   mounted() {
@@ -43,21 +46,21 @@ export default Vue.extend({
       this.handleAddToFirebase(this.inputText)
       this.inputText = ''
     },
+    handleSignOut() {
+      this.$firebase.auth().signOut()
+      console.log('signout')
+    },
     handleSignIn() {
-      console.log(this.$firebase.auth.GoogleAuthProvider)
-
       const provider = new this.$firebase.auth.GoogleAuthProvider()
 
       this.$firebase
         .auth()
-        .signInWithRedirect(provider)
-        .then((result: any) => {
-          const token = result.credential.accessToken
-          const user = result.user
-          console.log(token, user, result)
+        .signInWithPopup(provider)
+        .then(() => {
+          this.userName = this.$auth.currentUser.displayName || '名無し'
         })
         .catch(function (error) {
-          // Handle Errors here.
+          console.log('catch')
           const errorCode = error.code
           const errorMessage = error.message
           const email = error.email
@@ -65,8 +68,8 @@ export default Vue.extend({
           console.error(errorCode, errorMessage, email, credential)
         })
 
-      this.$firebase.auth().onAuthStateChanged(function (user) {
-        console.log(user)
+      this.$firebase.auth().onAuthStateChanged(() => {
+        console.log('onAuthStateChanged')
       })
     },
     handleAddToFirebase(addtodotext: string) {
@@ -95,32 +98,5 @@ export default Vue.extend({
 */
 .container {
   margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.title {
-  font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
-
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-
-.links {
-  padding-top: 15px;
 }
 </style>
