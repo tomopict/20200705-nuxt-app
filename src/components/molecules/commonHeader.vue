@@ -1,7 +1,9 @@
 <template>
   <ul class="header-lists bg-blue-400 p-3 flex">
-    <li class="p-1">{{ userName }}</li>
-    <li class="p-1">{{ photoUrl }}</li>
+    <li class="username">{{ userName }}</li>
+    <li class="userphoto">
+      <img :src="photoUrl" />
+    </li>
   </ul>
 </template>
 
@@ -25,5 +27,15 @@ export default Vue.extend({
 .header-lists {
   color: white;
   justify-content: flex-end;
+  align-items: center;
+}
+.username {
+  margin-right: 10px;
+}
+.userphoto {
+  border-radius: 30px;
+  overflow: hidden;
+  width: 30px;
+  height: 30px;
 }
 </style>
