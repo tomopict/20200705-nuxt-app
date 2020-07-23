@@ -50,9 +50,9 @@ export default Vue.extend({
   },
   computed: {},
   mounted() {
-    // this.$firebase.auth().onAuthStateChanged(() => {
-    //   console.log('onAuthStateChanged')
-    // })
+    this.$firebase.auth().onAuthStateChanged(() => {
+      console.log('onAuthStateChanged')
+    })
     // let docUsers = this.$firestore
     //   .collection('shoppinglist')
     //   .where('display', '==', true)
