@@ -2,27 +2,31 @@
   <div class="container">
     <CommonHeader :userName="userName" :photoUrl="photoUrl"></CommonHeader>
     <div>
-      <h1 class="mb-10 mt-10">お買い物リスト</h1>
+      <h1 class="mb-5 mt-5">お買い物リスト</h1>
 
-      <div>
-        <BaseButton @click.native="handleSignIn">singin</BaseButton>
-        <BaseButton @click.native="handleSignOut">singout</BaseButton>
+      <div class="mb-5">
+        <BaseButton v-if="!isLogin" @click.native="handleSignIn"
+          >singin</BaseButton
+        >
+        <BaseButton v-else @click.native="handleSignOut">singout</BaseButton>
       </div>
 
       <ToDolists id="todo-list" :lists="lists"></ToDolists>
-      <div>
-        <p>買うものを以下のボックスに記入してください</p>
+
+      <div class="fixed bottom-0 w-full p-2 bg-gray-300">
         <input
           v-model="purchasePlanText"
-          class="border-gray-100 p-3"
+          class="border-gray-700 p-3 border-radius"
           type="text"
           placeholder="買うもの"
         />
         <BaseButton
           @click.native="handleAddShoppingList"
           :style="{
-            background: '##7BE07D',
+            color: 'white',
+            height: '50px',
           }"
+          class="bg-green-700"
           >追加</BaseButton
         >
       </div>
@@ -41,18 +45,28 @@ interface FormatedList {
   name: String
   writeTime: String
   display: Boolean
-  id: Number
+  id: String
 }
+
+interface DataType {
+  purchasePlanText: String
+  lists: any
+  userName: String
+  photoUrl: String
+  isLogin: Boolean
+}
+
 const PLACE_HOLDER_IMAGE_URL = '/assets/img/placeholder.png'
 
 export default Vue.extend({
   components: { ToDolists, CommonHeader, BaseButton },
-  data() {
+  data(): DataType {
     return {
       purchasePlanText: '',
       lists: [],
       userName: '名無し',
       photoUrl: PLACE_HOLDER_IMAGE_URL,
+      isLogin: false,
     }
   },
   computed: {},
@@ -73,26 +87,32 @@ export default Vue.extend({
           // https://firebase.google.com/docs/firestore/query-data/listen?hl=ja#events-local-changes
           if (source === 'Local') return
 
-          const formatedList = {} as FormatedList
-          formatedList.title = change.doc.data().title
-          formatedList.name = change.doc.data().name
-          formatedList.writeTime = this.$dayjs(
-            change.doc.data().timestamp.seconds * 1000
-          ).format('YYYY/MM/DD')
-          formatedList.display = change.doc.data().display
-          formatedList.id = change.doc.data().id
+          const formatedList: FormatedList = {
+            title: change.doc.data().title,
+            name: change.doc.data().name,
+            writeTime: this.$dayjs(
+              change.doc.data().timestamp.seconds * 1000
+            ).format('YYYY/MM/DD'),
+            display: change.doc.data().display,
+            id: change.doc.id,
+          }
 
           if (change.type === 'added') {
             // @ts-ignore
             this.lists.push(formatedList)
-            console.log('Add: ', change.doc.data())
-          } else if (change.type === 'modified') {
+            console.log('Add Lists: ', change.doc.data())
+          }
+          if (change.type === 'modified') {
             // @ts-ignore
             this.lists.push(formatedList)
-            console.log('Modified city: ', change.doc.data())
-          } else if (change.type === 'removed') {
-            // @ts-ignore
-            console.log('Removed city: ', change.doc.data())
+            console.log('Modified Lists: ', change.doc.data())
+          }
+          if (change.type === 'removed') {
+            const newList = this.lists.filter((list: FormatedList) => {
+              return list.id !== change.doc.id
+            })
+            this.lists = newList
+            console.log('Removed Lists: ', change.doc.data())
           }
         })
       })
@@ -118,7 +138,6 @@ export default Vue.extend({
             this.$auth.currentUser.photoURL || PLACE_HOLDER_IMAGE_URL
         })
         .catch((error) => {
-          console.log('catch')
           const errorCode = error.code
           const errorMessage = error.message
           const email = error.email
@@ -126,7 +145,7 @@ export default Vue.extend({
           console.error(errorCode, errorMessage, email, credential)
         })
     },
-    handleAddToFirebase(purchasePlanText: string) {
+    handleAddToFirebase(purchasePlanText: String) {
       const db = this.$firebase.firestore()
       db.collection('shoppinglist')
         .add({
@@ -138,17 +157,6 @@ export default Vue.extend({
         })
         .then((docRef) => {
           console.log('Document added with ID: ', docRef.id)
-          db.collection('shoppinglist')
-            .doc(docRef.id)
-            .update({
-              id: docRef.id,
-            })
-            .then(() => {
-              console.log('Document updated with ID: ', docRef.id)
-            })
-            .catch((error) => {
-              console.error('Error update document: ', error)
-            })
         })
         .catch((error) => {
           console.error('Error adding document: ', error)
