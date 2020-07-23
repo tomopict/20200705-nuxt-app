@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <!-- <CommonHeader :userName="userName" :photoUrl="photoUrl"></CommonHeader>
+    <CommonHeader :userName="userName" :photoUrl="photoUrl"></CommonHeader>
     <div>
       <h1>お買い物リスト</h1>
 
@@ -20,15 +20,15 @@
         />
         <button @click="handleAddShoppingList">追加</button>
       </div>
-    </div> -->
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-// import CommonHeader from '@/components/molecules/commonHeader.vue'
-// import BaseButton from '@/components/atoms/baseButton.vue'
-// import ToDolists from '@/components/molecules/todolists.vue'
+import CommonHeader from '@/components/molecules/commonHeader.vue'
+import BaseButton from '@/components/atoms/baseButton.vue'
+import ToDolists from '@/components/molecules/todolists.vue'
 
 interface formatedList {
   title: String
@@ -39,7 +39,7 @@ interface formatedList {
 const PLACE_HOLDER_IMAGE_URL = '/assets/img/placeholder.png'
 
 export default Vue.extend({
-  // components: { ToDolists, CommonHeader, BaseButton },
+  components: { ToDolists, CommonHeader, BaseButton },
   data() {
     return {
       purchasePlanText: '',
