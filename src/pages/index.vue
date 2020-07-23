@@ -85,50 +85,50 @@ export default Vue.extend({
     //   })
   },
   methods: {
-    // handleAddShoppingList() {
-    //   if (!this.purchasePlanText) return
-    //   this.handleAddToFirebase(this.purchasePlanText)
-    //   this.purchasePlanText = ''
-    // },
-    // handleSignOut() {
-    //   this.$firebase.auth().signOut()
-    //   console.log('signout')
-    // },
-    // handleSignIn() {
-    //   const provider = new this.$firebase.auth.GoogleAuthProvider()
-    //   this.$firebase
-    //     .auth()
-    //     .signInWithPopup(provider)
-    //     .then(() => {
-    //       this.userName = this.$auth.currentUser.displayName || ''
-    //       this.photoUrl =
-    //         this.$auth.currentUser.photoURL || PLACE_HOLDER_IMAGE_URL
-    //     })
-    //     .catch(function (error) {
-    //       console.log('catch')
-    //       const errorCode = error.code
-    //       const errorMessage = error.message
-    //       const email = error.email
-    //       const credential = error.credential
-    //       console.error(errorCode, errorMessage, email, credential)
-    //     })
-    // },
-    // handleAddToFirebase(purchasePlanText: string) {
-    //   const db = this.$firebase.firestore()
-    //   db.collection('shoppinglist')
-    //     .add({
-    //       name: this.userName,
-    //       title: purchasePlanText,
-    //       timestamp: this.$firebase.firestore.FieldValue.serverTimestamp(),
-    //       display: true,
-    //     })
-    //     .then(function (docRef) {
-    //       console.log('Document written with ID: ', docRef.id)
-    //     })
-    //     .catch(function (error) {
-    //       console.error('Error adding document: ', error)
-    //     })
-    // },
+    handleAddShoppingList() {
+      if (!this.purchasePlanText) return
+      this.handleAddToFirebase(this.purchasePlanText)
+      this.purchasePlanText = ''
+    },
+    handleSignOut() {
+      this.$firebase.auth().signOut()
+      console.log('signout')
+    },
+    handleSignIn() {
+      const provider = new this.$firebase.auth.GoogleAuthProvider()
+      this.$firebase
+        .auth()
+        .signInWithPopup(provider)
+        .then(() => {
+          this.userName = this.$auth.currentUser.displayName || ''
+          this.photoUrl =
+            this.$auth.currentUser.photoURL || PLACE_HOLDER_IMAGE_URL
+        })
+        .catch(function (error) {
+          console.log('catch')
+          const errorCode = error.code
+          const errorMessage = error.message
+          const email = error.email
+          const credential = error.credential
+          console.error(errorCode, errorMessage, email, credential)
+        })
+    },
+    handleAddToFirebase(purchasePlanText: string) {
+      const db = this.$firebase.firestore()
+      db.collection('shoppinglist')
+        .add({
+          name: this.userName,
+          title: purchasePlanText,
+          timestamp: this.$firebase.firestore.FieldValue.serverTimestamp(),
+          display: true,
+        })
+        .then(function (docRef) {
+          console.log('Document written with ID: ', docRef.id)
+        })
+        .catch(function (error) {
+          console.error('Error adding document: ', error)
+        })
+    },
   },
 })
 </script>
