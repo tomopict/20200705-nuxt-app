@@ -29,6 +29,7 @@ export default {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
+    '@nuxtjs/dayjs',
   ],
   env: {
     FIREBASE_API_KEY: process.env.FIREBASE_API_KEY,
