@@ -2,7 +2,7 @@
   <div class="container">
     <CommonHeader :userName="userName" :photoUrl="photoUrl"></CommonHeader>
     <div>
-      <h1>お買い物リスト</h1>
+      <h1 class="mb-10 mt-10">お買い物リスト</h1>
 
       <div>
         <BaseButton @click.native="handleSignIn">singin</BaseButton>
@@ -18,7 +18,13 @@
           type="text"
           placeholder="買うもの"
         />
-        <button @click="handleAddShoppingList">追加</button>
+        <BaseButton
+          @click.native="handleAddShoppingList"
+          :style="{
+            background: '##7BE07D',
+          }"
+          >追加</BaseButton
+        >
       </div>
     </div>
   </div>
@@ -35,6 +41,7 @@ interface FormatedList {
   name: String
   writeTime: String
   display: Boolean
+  id: Number
 }
 const PLACE_HOLDER_IMAGE_URL = '/assets/img/placeholder.png'
 
@@ -73,6 +80,7 @@ export default Vue.extend({
             change.doc.data().timestamp.seconds * 1000
           ).format('YYYY/MM/DD')
           formatedList.display = change.doc.data().display
+          formatedList.id = change.doc.data().id
 
           if (change.type === 'added') {
             // @ts-ignore
@@ -109,7 +117,7 @@ export default Vue.extend({
           this.photoUrl =
             this.$auth.currentUser.photoURL || PLACE_HOLDER_IMAGE_URL
         })
-        .catch(function (error) {
+        .catch((error) => {
           console.log('catch')
           const errorCode = error.code
           const errorMessage = error.message
@@ -122,15 +130,27 @@ export default Vue.extend({
       const db = this.$firebase.firestore()
       db.collection('shoppinglist')
         .add({
+          id: '',
           name: this.userName,
           title: purchasePlanText,
           timestamp: this.$firebase.firestore.FieldValue.serverTimestamp(),
           display: true,
         })
-        .then(function (docRef) {
-          console.log('Document written with ID: ', docRef.id)
+        .then((docRef) => {
+          console.log('Document added with ID: ', docRef.id)
+          db.collection('shoppinglist')
+            .doc(docRef.id)
+            .update({
+              id: docRef.id,
+            })
+            .then(() => {
+              console.log('Document updated with ID: ', docRef.id)
+            })
+            .catch((error) => {
+              console.error('Error update document: ', error)
+            })
         })
-        .catch(function (error) {
+        .catch((error) => {
           console.error('Error adding document: ', error)
         })
     },
