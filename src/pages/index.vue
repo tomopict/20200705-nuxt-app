@@ -60,17 +60,18 @@ export default Vue.extend({
         querySnapshot.docChanges().forEach((change) => {
           console.log(change)
 
-          // const source = change.doc.metadata.hasPendingWrites
-          //   ? 'Local'
-          //   : 'Server'
+          const source = change.doc.metadata.hasPendingWrites
+            ? 'Local'
+            : 'Server'
           // if (source === 'Local') return
-          // const formatedList = <formatedList>{}
-          // formatedList.title = change.doc.data().title
-          // formatedList.name = change.doc.data().name
-          // formatedList.writeTime = this.$dayjs(
-          //   change.doc.data().timestamp.seconds * 1000
-          // ).format('YYYY/MM/DD')
-          // formatedList.display = change.doc.data().display
+          const formatedList = {}
+          formatedList.title = change.doc.data().title
+          formatedList.name = change.doc.data().name
+          formatedList.writeTime = this.$dayjs(
+            change.doc.data().timestamp.seconds * 1000
+          ).format('YYYY/MM/DD')
+          formatedList.display = change.doc.data().display
+
           // if (change.type === 'added') {
           //   // @ts-ignore
           //   this.lists.push(formatedList)
@@ -83,6 +84,7 @@ export default Vue.extend({
           //   // @ts-ignore
           //   console.log('Removed city: ', change.doc.data())
           // }
+          console.log(formatedList, source)
         })
       })
     console.log(docUsers)
