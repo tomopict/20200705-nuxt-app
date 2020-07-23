@@ -53,36 +53,39 @@ export default Vue.extend({
     this.$firebase.auth().onAuthStateChanged(() => {
       console.log('onAuthStateChanged')
     })
-    // let docUsers = this.$firestore
-    //   .collection('shoppinglist')
-    //   .where('display', '==', true)
-    //   .onSnapshot((querySnapshot) => {
-    //     querySnapshot.docChanges().forEach((change) => {
-    //       const source = change.doc.metadata.hasPendingWrites
-    //         ? 'Local'
-    //         : 'Server'
-    //       if (source === 'Local') return
-    //       const formatedList = <formatedList>{}
-    //       formatedList.title = change.doc.data().title
-    //       formatedList.name = change.doc.data().name
-    //       formatedList.writeTime = this.$dayjs(
-    //         change.doc.data().timestamp.seconds * 1000
-    //       ).format('YYYY/MM/DD')
-    //       formatedList.display = change.doc.data().display
-    //       if (change.type === 'added') {
-    //         // @ts-ignore
-    //         this.lists.push(formatedList)
-    //         console.log('Add: ', change.doc.data())
-    //       } else if (change.type === 'modified') {
-    //         // @ts-ignore
-    //         this.lists.push(formatedList)
-    //         console.log('Modified city: ', change.doc.data())
-    //       } else if (change.type === 'removed') {
-    //         // @ts-ignore
-    //         console.log('Removed city: ', change.doc.data())
-    //       }
-    //     })
-    //   })
+    const docUsers = this.$firestore
+      .collection('shoppinglist')
+      .where('display', '==', true)
+      .onSnapshot((querySnapshot) => {
+        querySnapshot.docChanges().forEach((change) => {
+          console.log(change)
+
+          // const source = change.doc.metadata.hasPendingWrites
+          //   ? 'Local'
+          //   : 'Server'
+          // if (source === 'Local') return
+          // const formatedList = <formatedList>{}
+          // formatedList.title = change.doc.data().title
+          // formatedList.name = change.doc.data().name
+          // formatedList.writeTime = this.$dayjs(
+          //   change.doc.data().timestamp.seconds * 1000
+          // ).format('YYYY/MM/DD')
+          // formatedList.display = change.doc.data().display
+          // if (change.type === 'added') {
+          //   // @ts-ignore
+          //   this.lists.push(formatedList)
+          //   console.log('Add: ', change.doc.data())
+          // } else if (change.type === 'modified') {
+          //   // @ts-ignore
+          //   this.lists.push(formatedList)
+          //   console.log('Modified city: ', change.doc.data())
+          // } else if (change.type === 'removed') {
+          //   // @ts-ignore
+          //   console.log('Removed city: ', change.doc.data())
+          // }
+        })
+      })
+    console.log(docUsers)
   },
   methods: {
     handleAddShoppingList() {
@@ -100,8 +103,8 @@ export default Vue.extend({
         .auth()
         .signInWithPopup(provider)
         .then(() => {
-          this.userName = this.$auth.currentUser.displayName || ''
-          this.photoUrl =
+          this.username = this.$auth.currentUser.displayName || ''
+          this.photourl =
             this.$auth.currentUser.photoURL || PLACE_HOLDER_IMAGE_URL
         })
         .catch(function (error) {
