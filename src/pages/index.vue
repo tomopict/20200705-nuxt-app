@@ -30,7 +30,7 @@ import CommonHeader from '@/components/molecules/commonHeader.vue'
 import BaseButton from '@/components/atoms/baseButton.vue'
 import ToDolists from '@/components/molecules/todolists.vue'
 
-interface formatedList {
+interface FormatedList {
   title: String
   name: String
   writeTime: String
@@ -64,7 +64,7 @@ export default Vue.extend({
             ? 'Local'
             : 'Server'
           // if (source === 'Local') return
-          const formatedList = {}
+          const formatedList = {} as FormatedList
           formatedList.title = change.doc.data().title
           formatedList.name = change.doc.data().name
           formatedList.writeTime = this.$dayjs(
