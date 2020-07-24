@@ -1,5 +1,7 @@
 <template>
-  <header class="bg-blue-400 p-2 flex justify-between items-center">
+  <header
+    class="bg-gray-300 text-gray-600 p-2 flex justify-between items-center"
+  >
     <ul class="header-lists flex items-center">
       <li class="username">{{ userName }}</li>
       <li class="userphoto">
@@ -28,7 +30,6 @@ export default Vue.extend({
 </script>
 <style lang="scss" scoped>
 header {
-  color: white;
   align-items: center;
 }
 .username {

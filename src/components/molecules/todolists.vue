@@ -11,12 +11,12 @@
         role="checkbox"
         aria-checked="false"
         @click="handleDeletePurchaseData(list.id)"
-        class="mr-2 text-sm"
+        class="mr-2 text-sm underline"
       >
         購入
       </button>
       <div class="flex-1">
-        <p class="w-100 text-lg">{{ list.title }}</p>
+        <p class="w-100 text-lg font-semibold">{{ list.title }}</p>
         <p class="flex justify-between text-xs">
           <span class="text-red-300">{{ list.writeTime }}</span>
           <span class="text-gray-400">{{ list.name }}</span>
