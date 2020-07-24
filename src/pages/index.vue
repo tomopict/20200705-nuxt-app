@@ -66,7 +66,7 @@ interface DataType {
   isLogin: Boolean
 }
 
-const PLACE_HOLDER_IMAGE_URL = '/assets/img/placeholder.png'
+const PLACE_HOLDER_IMAGE_URL = '/placeholder.png'
 
 export default Vue.extend({
   components: { ToDolists, CommonHeader, BaseButton },
@@ -136,6 +136,9 @@ export default Vue.extend({
     handleSignOut() {
       this.isLogin = false
       this.$firebase.auth().signOut()
+      this.userName = '名無し'
+      this.photoUrl = PLACE_HOLDER_IMAGE_URL
+      this.isLogin = false
       console.log('signout')
     },
     handleSignIn() {
