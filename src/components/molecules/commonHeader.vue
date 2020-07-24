@@ -1,10 +1,13 @@
 <template>
-  <ul class="header-lists bg-blue-400 p-3 flex">
-    <li class="username">{{ userName }}</li>
-    <li class="userphoto">
-      <img :src="photoUrl" />
-    </li>
-  </ul>
+  <header class="bg-blue-400 p-2 flex justify-between items-center">
+    <ul class="header-lists flex items-center">
+      <li class="username">{{ userName }}</li>
+      <li class="userphoto">
+        <img :src="photoUrl" />
+      </li>
+    </ul>
+    <slot />
+  </header>
 </template>
 
 <script lang="ts">
@@ -24,9 +27,8 @@ export default Vue.extend({
 })
 </script>
 <style lang="scss" scoped>
-.header-lists {
+header {
   color: white;
-  justify-content: flex-end;
   align-items: center;
 }
 .username {

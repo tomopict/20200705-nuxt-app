@@ -1,22 +1,32 @@
 <template>
   <div class="container">
-    <CommonHeader :userName="userName" :photoUrl="photoUrl"></CommonHeader>
-    <div>
-      <h1 class="mb-5 mt-5">お買い物リスト</h1>
-
-      <div class="mb-5">
-        <BaseButton v-if="!isLogin" @click.native="handleSignIn"
-          >singin</BaseButton
+    <CommonHeader :userName="userName" :photoUrl="photoUrl">
+      <div>
+        <BaseButton
+          v-if="!isLogin"
+          @click.native="handleSignIn"
+          :class="'bg-white text-gray-600 text-xs'"
+          >ログイン</BaseButton
         >
-        <BaseButton v-else @click.native="handleSignOut">singout</BaseButton>
+        <BaseButton
+          v-else
+          @click.native="handleSignOut"
+          :class="'bg-white text-gray-600 text-xs'"
+          >ログアウト</BaseButton
+        >
       </div>
+    </CommonHeader>
+    <main class="p-2">
+      <h1 class="main-title mb-2 mt-2">お買い物リスト</h1>
 
       <ToDolists id="todo-list" :lists="lists"></ToDolists>
 
-      <div class="fixed bottom-0 w-full p-2 bg-gray-300">
+      <div
+        class="fixed bottom-0 left-0 w-full p-2 bg-gray-300 flex items-center"
+      >
         <input
           v-model="purchasePlanText"
-          class="border-gray-700 p-3 border-radius"
+          class="input-text p-1 border-gray-700 border-radius"
           type="text"
           placeholder="買うもの"
         />
@@ -24,13 +34,13 @@
           @click.native="handleAddShoppingList"
           :style="{
             color: 'white',
-            height: '50px',
+            height: '30px',
           }"
           class="bg-green-700"
           >追加</BaseButton
         >
       </div>
-    </div>
+    </main>
   </div>
 </template>
 
@@ -124,6 +134,7 @@ export default Vue.extend({
       this.purchasePlanText = ''
     },
     handleSignOut() {
+      this.isLogin = false
       this.$firebase.auth().signOut()
       console.log('signout')
     },
@@ -136,6 +147,7 @@ export default Vue.extend({
           this.userName = this.$auth.currentUser.displayName || ''
           this.photoUrl =
             this.$auth.currentUser.photoURL || PLACE_HOLDER_IMAGE_URL
+          this.isLogin = true
         })
         .catch((error) => {
           const errorCode = error.code
@@ -166,13 +178,28 @@ export default Vue.extend({
 })
 </script>
 
-<style>
+<style lang="scss">
+$fixed-button-mr: 10px;
+
 /* Sample `apply` at-rules with Tailwind CSS
 .container {
 @apply min-h-screen flex justify-center items-center text-center mx-auto;
 }
 */
 .container {
+  max-width: none;
   margin: 0 auto;
+}
+
+.main {
+  &-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+}
+.input-text {
+  width: calc(100% - 100px - #{$fixed-button-mr});
+  height: 30px;
+  margin-right: $fixed-button-mr;
 }
 </style>

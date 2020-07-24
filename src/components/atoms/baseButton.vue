@@ -11,8 +11,10 @@ export default Vue.extend({})
 
 <style scoped>
 button {
-  padding: 10px;
-  border: 1px solid #000;
-  border-radius: 5px;
+  padding: 5px 7px;
+  border-radius: 20px;
+  min-width: 100px;
+  line-height: 1;
+  height: 30px;
 }
 </style>

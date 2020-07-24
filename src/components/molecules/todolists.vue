@@ -1,10 +1,27 @@
 <template>
   <ul>
-    <li v-for="list in lists" :key="list.id" :class="list.id" class="mb-3">
-      記入者：{{ list.name }} 内容；{{ list.title }} 日時：{{ list.writeTime }}
-      <BaseButton @click.native="handleDeletePurchaseData(list.id)"
-        >削除する</BaseButton
+    <li
+      v-for="list in lists"
+      :key="list.id"
+      :class="list.id"
+      class="listitem flex mb-1 pb-1"
+    >
+      <button
+        type="p"
+        role="checkbox"
+        aria-checked="false"
+        @click="handleDeletePurchaseData(list.id)"
+        class="mr-2 text-sm"
       >
+        購入
+      </button>
+      <div class="flex-1">
+        <p class="w-100 text-lg">{{ list.title }}</p>
+        <p class="flex justify-between text-xs">
+          <span class="text-red-300">{{ list.writeTime }}</span>
+          <span class="text-gray-400">{{ list.name }}</span>
+        </p>
+      </div>
     </li>
   </ul>
 </template>
@@ -13,6 +30,11 @@
 import Vue from 'vue'
 
 export default Vue.extend({
+  data() {
+    return {
+      isLogin: false,
+    }
+  },
   props: {
     lists: {
       type: Array,
@@ -37,7 +59,13 @@ export default Vue.extend({
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.listitem {
+  &:not(:last-child) {
+    border-bottom: 1px solid;
+    @apply border-gray-300;
+  }
+}
 li {
   background-color: #fff;
 }
