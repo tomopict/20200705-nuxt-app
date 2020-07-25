@@ -5,15 +5,29 @@
         <BaseButton
           v-if="!isLogin"
           @click.native="handleSignIn"
-          :class="'bg-white text-gray-600 text-xs'"
+          :class="'text-xs border-gray-600 border'"
           >ログイン</BaseButton
         >
         <BaseButton
           v-else
           @click.native="handleSignOut"
-          :class="'bg-white text-gray-600 text-xs'"
+          :class="'text-xs border-gray-600 border'"
           >ログアウト</BaseButton
         >
+        <template v-if="isMessagingApiSupported">
+          <BaseButton
+            v-if="!textInstanceIdToken"
+            @click.native="handleIntializedMessaging"
+            :class="'text-xs border-gray-600 border'"
+            >認証</BaseButton
+          >
+          <BaseButton
+            v-else
+            @click.native="handleDeleteToken"
+            :class="'text-xs border-gray-600 border'"
+            >認証解消</BaseButton
+          >
+        </template>
       </div>
     </CommonHeader>
     <main class="p-2">
@@ -28,15 +42,15 @@
           v-model="purchasePlanText"
           class="input-text p-1 border-gray-700 border-radius"
           type="text"
-          placeholder="買うもの"
+          placeholder="買いたいものを入れてよ"
         />
         <BaseButton
           @click.native="handleAddShoppingList"
           :style="{
             color: 'white',
-            height: '30px',
+            height: '40px',
           }"
-          class="bg-green-700"
+          class="bg-green-500"
           >追加</BaseButton
         >
       </div>
@@ -64,6 +78,8 @@ interface DataType {
   userName: String
   photoUrl: String
   isLogin: Boolean
+  isMessagingApiSupported: Boolean
+  textInstanceIdToken: String
 }
 
 const PLACE_HOLDER_IMAGE_URL = '/placeholder.png'
@@ -77,6 +93,8 @@ export default Vue.extend({
       userName: '名無し',
       photoUrl: PLACE_HOLDER_IMAGE_URL,
       isLogin: false,
+      isMessagingApiSupported: false,
+      textInstanceIdToken: '',
     }
   },
   computed: {},
@@ -126,6 +144,19 @@ export default Vue.extend({
           }
         })
       })
+
+    if (this.$firebase.messaging.isSupported()) {
+      const messaging = this.$firebase.messaging()
+      messaging.onMessage((payload) => {
+        console.log('Message received. ', payload)
+      })
+      this.isMessagingApiSupported = true
+      // messaging.onTokenRefresh(function () {
+      //   messaging.getToken().then(function (refreshedToken) {
+      //     console.log('refreshedToken', refreshedToken)
+      //   })
+      // })
+    }
   },
   methods: {
     handleAddShoppingList() {
@@ -177,6 +208,72 @@ export default Vue.extend({
           console.error('Error adding document: ', error)
         })
     },
+    handleIntializedMessaging() {
+      const messaging = this.$firebase.messaging()
+      // @ts-ignore
+      if (!messaging.vapidKey) {
+        messaging.usePublicVapidKey(process.env.FIREBASE_PUBLIC_VAPID_KEY || '')
+      }
+      this.requestPermission(messaging)
+    },
+    requestPermission(messaging: any) {
+      // 通知を受信する権限を要求する
+      messaging
+        .requestPermission()
+        .then(() => {
+          // 現在の登録トークンの取得
+          messaging
+            .getToken()
+            .then((token: String) => {
+              console.log('トークンの取得に成功しました')
+              this.textInstanceIdToken = token
+
+              const db = this.$firebase.firestore()
+              db.collection('users')
+                .doc(this.userName.toString())
+                .set({
+                  fcmToken: token,
+                  name: this.userName,
+                })
+                .then(() => {
+                  console.log('Document successfully written!')
+                })
+                .catch((error) => {
+                  console.error('Error adding document: ', error)
+                })
+            })
+            .catch((err: any) => {
+              this.textInstanceIdToken =
+                'トークンの取得に失敗しました（' + err + '）。'
+            })
+        })
+        .catch((err: any) => {
+          this.textInstanceIdToken =
+            '通知の許可が得られませんでした（' + err + '）。'
+        })
+    },
+    handleDeleteToken() {
+      const messaging = this.$firebase.messaging()
+      // 通知を受信する権限を要求する
+      messaging
+        .getToken()
+        .then((currentToken) => {
+          messaging
+            .deleteToken(currentToken)
+            .then(() => {
+              console.log('tokenを削除')
+              this.textInstanceIdToken = ''
+            })
+            .catch((err) => {
+              this.textInstanceIdToken =
+                'トークンの取得に失敗しました（' + err + '）。'
+            })
+        })
+        .catch((err) => {
+          this.textInstanceIdToken =
+            'トークンの取得に失敗しました（' + err + '）。'
+        })
+    },
   },
 })
 </script>
@@ -197,12 +294,11 @@ $fixed-button-mr: 10px;
 .main {
   &-title {
     font-size: 1.2rem;
-    font-weight: bold;
   }
 }
 .input-text {
   width: calc(100% - 100px - #{$fixed-button-mr});
-  height: 30px;
+  height: 40px;
   margin-right: $fixed-button-mr;
 }
 </style>
