@@ -3,7 +3,7 @@ import 'firebase/firestore'
 // import 'firebase/storage'
 // import 'firebase/functions'
 import 'firebase/auth'
-// import 'firebase/messaging'
+import 'firebase/messaging'
 // import 'firebase/analytics'
 
 const config: any = {
