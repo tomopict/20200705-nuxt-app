@@ -1,7 +1,7 @@
 export default {
   srcDir: 'src',
   mode: 'universal',
-  target: 'server',
+  target: 'static',
   head: {
     title: process.env.npm_package_name || '',
     meta: [
@@ -39,7 +39,11 @@ export default {
     FIREBASE_STORAGE_BUCKET: process.env.FIREBASE_STORAGE_BUCKET,
     FIREBASE_MESSAGING_SENDER_ID: process.env.FIREBASE_MESSAGING_SENDER_ID,
     FIREBASE_APP_ID: process.env.FIREBASE_APP_ID,
+    FIREBASE_PUBLIC_VAPID_KEY: process.env.FIREBASE_PUBLIC_VAPID_KEY,
   },
   axios: {},
   build: {},
+  manifest: {
+    gcm_sender_id: '505789450982',
+  },
 }
