@@ -74,7 +74,7 @@ interface FormatedList {
 
 interface DataType {
   purchasePlanText: String
-  lists: any
+  lists: FormatedList[]
   userName: String
   photoUrl: String
   isLogin: Boolean
@@ -97,7 +97,6 @@ export default Vue.extend({
       textInstanceIdToken: '',
     }
   },
-  computed: {},
   mounted() {
     this.$firebase.auth().onAuthStateChanged(() => {
       console.log('onAuthStateChanged')
@@ -107,7 +106,8 @@ export default Vue.extend({
       .where('display', '==', true)
       .onSnapshot((querySnapshot) => {
         querySnapshot.docChanges().forEach((change) => {
-          const source = change.doc.metadata.hasPendingWrites
+          const source: 'Local' | 'Server' = change.doc.metadata
+            .hasPendingWrites
             ? 'Local'
             : 'Server'
 
@@ -126,12 +126,10 @@ export default Vue.extend({
           }
 
           if (change.type === 'added') {
-            // @ts-ignore
             this.lists.push(formatedList)
             console.log('Add Lists: ', change.doc.data())
           }
           if (change.type === 'modified') {
-            // @ts-ignore
             this.lists.push(formatedList)
             console.log('Modified Lists: ', change.doc.data())
           }
@@ -195,7 +193,6 @@ export default Vue.extend({
       const db = this.$firebase.firestore()
       db.collection('shoppinglist')
         .add({
-          id: '',
           name: this.userName,
           title: purchasePlanText,
           timestamp: this.$firebase.firestore.FieldValue.serverTimestamp(),
@@ -216,16 +213,13 @@ export default Vue.extend({
       }
       this.requestPermission(messaging)
     },
-    requestPermission(messaging: any) {
-      // 通知を受信する権限を要求する
+    requestPermission(messaging: firebase.messaging.Messaging) {
       messaging
         .requestPermission()
         .then(() => {
-          // 現在の登録トークンの取得
           messaging
             .getToken()
             .then((token: String) => {
-              console.log('トークンの取得に成功しました')
               this.textInstanceIdToken = token
 
               const db = this.$firebase.firestore()
@@ -254,7 +248,6 @@ export default Vue.extend({
     },
     handleDeleteToken() {
       const messaging = this.$firebase.messaging()
-      // 通知を受信する権限を要求する
       messaging
         .getToken()
         .then((currentToken) => {
