@@ -5,6 +5,11 @@ const line = require('@line/bot-sdk')
 admin.initializeApp(functions.config().firebase)
 export const firestore = admin.firestore()
 
+// interface MessageTypes {
+//   before: any
+//   after: any
+// }
+
 /**
  * LINE Bot
  *
@@ -47,13 +52,31 @@ const sendPushNotification = function (
 export const createMessage = functions
   .region('asia-northeast1')
   .firestore.document('/shoppinglist/{message}')
-  .onCreate(async (snapshot, context) => {
-    // ここにmessageのデータが入っている(senderId,senderName,receiverId,content)
-    const message = snapshot.data()
-    console.log('createFunctions', message)
-    const receiverRef = firestore.collection('users').doc(message.name)
+  .onWrite(async (change, context) => {
+    let receiverRef, senderName: any, content: any
+    let message: any
+    if (change.before.exists && change.after.exists) {
+      console.log('変更された')
+      message = change.after.data()
+    } else if (!change.after.exists) {
+      console.log('削除された')
+      // @ts-ignore
+      message = change.before.data()
+      receiverRef = firestore.collection('users').doc(message.name)
+      senderName = message.name
+      content = `${message.title}を買ったみたい!`
+    } else {
+      // @ts-ignore
+      console.log('作成された', change.after.data())
+      // @ts-ignore
+      message = change.after.data()
+      // @ts-ignore
+      receiverRef = firestore.collection('users').doc(message.name)
+      senderName = message.name
+      content = `${message.title}を欲しいみたい!`
+    }
 
-    console.log('receiverRef', receiverRef)
+    console.log('createFunctions', message)
 
     // 受信者の情報にアクセスする
     receiverRef
@@ -63,19 +86,17 @@ export const createMessage = functions
           // 受信者の情報を取得(name,fcmToken)
           const receiver = doc.data()
           const fcmToken = receiver['fcmToken']
-          const senderName = message.name
-          const content = message['title']
 
           // 通知のタイトル
           const title = `${senderName}`
           // 通知の内容
-          const body = `${content}が作成されました`
+          const body = content
           sendPushNotification(fcmToken, title, body, '1')
           console.log('newMessage')
 
           const message_to_line = {
             type: 'text',
-            text: `${senderName}さんが${content}を欲しいらしい`,
+            text: `${senderName}さんが${content}`,
           }
 
           // https://line.github.io/line-bot-sdk-nodejs/api-reference/client.html#methods
@@ -106,13 +127,25 @@ export const createMessage = functions
 
 //   for (let event of events) {
 //     const { replyToken, type, message } = event
-
+//     let tmpMessage
 //     if (type == 'message') {
 //       if (message.type == 'text') {
-//         const tmpMessage = {
-//           type: 'text',
-//           text: message.text,
+//         console.log(message.text)
+
+//         const regex = /['欲しいもの'|'ほしいもの']/g
+//         if (message.text.exec(regex)) {
+
+//           tmpMessage = {
+//             type: 'text',
+//             text: message.text,
+//           }
+//         } else {
+//           tmpMessage = {
+//             type: 'text',
+//             text: message.text,
+//           }
 //         }
+
 //         client.replyMessage(replyToken, tmpMessage).then(() => {
 //           response.status(200).send('OK')
 //         })
