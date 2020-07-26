@@ -5,14 +5,8 @@ const line = require('@line/bot-sdk')
 admin.initializeApp(functions.config().firebase)
 export const firestore = admin.firestore()
 
-// interface MessageTypes {
-//   before: any
-//   after: any
-// }
-
 /**
  * LINE Bot
- *
  */
 const client = new line.Client({
   channelAccessToken: functions.config().linebot.channel_access_token,
@@ -53,30 +47,26 @@ export const createMessage = functions
   .region('asia-northeast1')
   .firestore.document('/shoppinglist/{message}')
   .onWrite(async (change, context) => {
-    let receiverRef, senderName: any, content: any
+    console.log('createMessage init', context)
+
+    let receiverRef, senderName: string, content: string
     let message: any
     if (change.before.exists && change.after.exists) {
       console.log('変更された')
       message = change.after.data()
     } else if (!change.after.exists) {
       console.log('削除された')
-      // @ts-ignore
       message = change.before.data()
       receiverRef = firestore.collection('users').doc(message.name)
       senderName = message.name
       content = `${message.title}を買ったみたい!`
     } else {
-      // @ts-ignore
       console.log('作成された', change.after.data())
-      // @ts-ignore
       message = change.after.data()
-      // @ts-ignore
       receiverRef = firestore.collection('users').doc(message.name)
       senderName = message.name
       content = `${message.title}を欲しいみたい!`
     }
-
-    console.log('createFunctions', message)
 
     // 受信者の情報にアクセスする
     receiverRef
@@ -96,15 +86,12 @@ export const createMessage = functions
 
           const message_to_line = {
             type: 'text',
-            text: `${senderName}さんが${content}`,
+            text: `${content}`,
           }
 
           // https://line.github.io/line-bot-sdk-nodejs/api-reference/client.html#methods
           client
-            .pushMessage(
-              functions.config().linebot.post_message_to,
-              message_to_line
-            )
+            .broadcast(message_to_line)
             .then((res: any) => {
               console.log('line send OK', res)
             })
@@ -121,35 +108,65 @@ export const createMessage = functions
   })
 
 // https://ruller.lsv.jp/?p=72
-// exports.line = functions.https.onRequest((request, response) => {
-//   const body = request.body
-//   const events = body.events
+exports.line = functions
+  .region('asia-northeast1')
+  .https.onRequest((request, response) => {
+    const body = request.body
+    const events = body.events
 
-//   for (let event of events) {
-//     const { replyToken, type, message } = event
-//     let tmpMessage
-//     if (type == 'message') {
-//       if (message.type == 'text') {
-//         console.log(message.text)
+    for (let event of events) {
+      const { replyToken, type, message } = event
+      let tmpMessage, tmpText: any
+      if (type == 'message') {
+        if (message.type == 'text') {
+          console.log(message.text)
 
-//         const regex = /['欲しいもの'|'ほしいもの']/g
-//         if (message.text.exec(regex)) {
+          // const regex = /'欲しいもの'|'ほしいもの'/g
+          // if (message.text.match(regex)) {
+          console.log('ありますね')
 
-//           tmpMessage = {
-//             type: 'text',
-//             text: message.text,
-//           }
-//         } else {
-//           tmpMessage = {
-//             type: 'text',
-//             text: message.text,
-//           }
-//         }
+          // const shoppingRef = firestore
+          //   .collection('shoppinglist')
+          //   .doc('')
 
-//         client.replyMessage(replyToken, tmpMessage).then(() => {
-//           response.status(200).send('OK')
-//         })
-//       }
-//     }
-//   }
-// })
+          // console.log('shoppingRefです')
+
+          // shoppingRef
+          // .where('display', '==', true)
+          // .get()
+          // .then(function (doc: any) {
+          //   console.log(doc)
+
+          //   // if (!querySnapshot.exists) {
+          //   //   console.log('No such document!')
+          //   //   tmpText = '今は何もないよ!'
+          //   // } else {
+          //   //   tmpText = 'あるよ!'
+          //   //   // querySnapshot.forEach((doc: any) => {
+          //   //   //   tmpText += `${doc.data().title}\n`
+          //   //   // })
+          //   // }
+          //   tmpText = 'ですよ!'
+          // })
+          // .catch((err: any) => {
+          //   console.log('Error getting document', err)
+          // })
+          tmpText = 'ですよ!'
+          tmpMessage = {
+            type: 'text',
+            text: tmpText,
+          }
+          // } else {
+          //   tmpMessage = {
+          //     type: 'text',
+          //     text: message.text,
+          //   }
+          // }
+
+          client.replyMessage(replyToken, tmpMessage).then(() => {
+            response.status(200).send('OK')
+          })
+        }
+      }
+    }
+  })
