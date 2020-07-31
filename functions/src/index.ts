@@ -5,6 +5,10 @@ const line = require('@line/bot-sdk')
 admin.initializeApp(functions.config().firebase)
 export const firestore = admin.firestore()
 
+interface tempMessage {
+  type: string
+  text: string
+}
 /**
  * LINE Bot
  */
@@ -116,56 +120,62 @@ exports.line = functions
 
     for (let event of events) {
       const { replyToken, type, message } = event
-      let tmpMessage, tmpText: any
+      let tmpMessage: tempMessage
+      let tmpText: string = ''
       if (type == 'message') {
         if (message.type == 'text') {
-          console.log(message.text)
+          const regex = /ほしいもの|欲しいもの/g
+          if (message.text.match(regex)) {
+            const shoppingRef = firestore.collection('shoppinglist')
 
-          // const regex = /'欲しいもの'|'ほしいもの'/g
-          // if (message.text.match(regex)) {
-          console.log('ありますね')
+            shoppingRef
+              .where('display', '==', true)
+              .get()
+              .then((querySnapshot: any) => {
+                response.status(200).send('OK')
+                console.info(querySnapshot.size)
 
-          // const shoppingRef = firestore
-          //   .collection('shoppinglist')
-          //   .doc('')
+                if (!querySnapshot.size) {
+                  tmpText = '今は何もないみたい!'
+                } else {
+                  querySnapshot.forEach((doc: any) => {
+                    tmpText += `${doc.data().title}\n`
+                  })
+                  tmpText += 'が欲しいみたいだよ!'
+                  tmpMessage = {
+                    type: 'text',
+                    text: tmpText,
+                  }
+                }
 
-          // console.log('shoppingRefです')
+                client
+                  .replyMessage(replyToken, tmpMessage)
+                  .then(() => {
+                    response.status(200).send('OK')
+                  })
+                  .catch((err: any) => {
+                    console.log('Error getting document', err)
+                  })
+              })
+              .catch((err: any) => {
+                response.status(400).send('NG')
+                console.log('Error getting document', err)
+              })
+          } else {
+            tmpMessage = {
+              type: 'text',
+              text: message.text,
+            }
 
-          // shoppingRef
-          // .where('display', '==', true)
-          // .get()
-          // .then(function (doc: any) {
-          //   console.log(doc)
-
-          //   // if (!querySnapshot.exists) {
-          //   //   console.log('No such document!')
-          //   //   tmpText = '今は何もないよ!'
-          //   // } else {
-          //   //   tmpText = 'あるよ!'
-          //   //   // querySnapshot.forEach((doc: any) => {
-          //   //   //   tmpText += `${doc.data().title}\n`
-          //   //   // })
-          //   // }
-          //   tmpText = 'ですよ!'
-          // })
-          // .catch((err: any) => {
-          //   console.log('Error getting document', err)
-          // })
-          tmpText = 'ですよ!'
-          tmpMessage = {
-            type: 'text',
-            text: tmpText,
+            client
+              .replyMessage(replyToken, tmpMessage)
+              .then(() => {
+                response.status(200).send('OK')
+              })
+              .catch((err: any) => {
+                console.log('Error getting document', err)
+              })
           }
-          // } else {
-          //   tmpMessage = {
-          //     type: 'text',
-          //     text: message.text,
-          //   }
-          // }
-
-          client.replyMessage(replyToken, tmpMessage).then(() => {
-            response.status(200).send('OK')
-          })
         }
       }
     }
