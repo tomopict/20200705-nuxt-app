@@ -20,6 +20,20 @@ const client = new line.Client({
 // Start writing Firebase Functions
 // https://firebase.google.com/docs/functions/typescript
 
+function handleClientReply(
+  replyToken: string,
+  tmpMessage: tempMessage,
+  response: functions.Response
+) {
+  client
+    .replyMessage(replyToken, tmpMessage)
+    .then(() => {
+      response.status(200).send('OK')
+    })
+    .catch((err: any) => {
+      console.log('Error getting document', err)
+    })
+}
 const sendPushNotification = function (
   token: string,
   title: string,
@@ -70,6 +84,7 @@ export const createMessage = functions
       receiverRef = firestore.collection('users').doc(message.name)
       senderName = message.name
       content = `${message.title}を欲しいみたい!`
+      console.log(receiverRef, content)
     }
 
     // 受信者の情報にアクセスする
@@ -148,14 +163,7 @@ exports.line = functions
                   }
                 }
 
-                client
-                  .replyMessage(replyToken, tmpMessage)
-                  .then(() => {
-                    response.status(200).send('OK')
-                  })
-                  .catch((err: any) => {
-                    console.log('Error getting document', err)
-                  })
+                handleClientReply(replyToken, tmpMessage, response)
               })
               .catch((err: any) => {
                 response.status(400).send('NG')
@@ -167,14 +175,7 @@ exports.line = functions
               text: message.text,
             }
 
-            client
-              .replyMessage(replyToken, tmpMessage)
-              .then(() => {
-                response.status(200).send('OK')
-              })
-              .catch((err: any) => {
-                console.log('Error getting document', err)
-              })
+            handleClientReply(replyToken, tmpMessage, response)
           }
         }
       }
