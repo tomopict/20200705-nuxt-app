@@ -33,6 +33,7 @@
     <main class="p-2">
       <h1 class="main-title mb-2 mt-2">お買い物リスト</h1>
 
+      <DailyLists :dailyLists="dailyLists"></DailyLists>
       <ToDolists id="todo-list" :lists="lists"></ToDolists>
 
       <div
@@ -63,6 +64,7 @@ import Vue from 'vue'
 import CommonHeader from '@/components/molecules/commonHeader.vue'
 import BaseButton from '@/components/atoms/baseButton.vue'
 import ToDolists from '@/components/molecules/todolists.vue'
+import DailyLists from '@/components/molecules/dailyLists.vue'
 
 interface FormatedList {
   title: String
@@ -75,6 +77,7 @@ interface FormatedList {
 interface DataType {
   purchasePlanText: String
   lists: FormatedList[]
+  dailyLists: any
   userName: String
   photoUrl: String
   isLogin: Boolean
@@ -85,11 +88,12 @@ interface DataType {
 const PLACE_HOLDER_IMAGE_URL = '/placeholder.png'
 
 export default Vue.extend({
-  components: { ToDolists, CommonHeader, BaseButton },
+  components: { ToDolists, CommonHeader, BaseButton, DailyLists },
   data(): DataType {
     return {
       purchasePlanText: '',
       lists: [],
+      dailyLists: [],
       userName: '名無し',
       photoUrl: PLACE_HOLDER_IMAGE_URL,
       isLogin: false,
@@ -97,11 +101,11 @@ export default Vue.extend({
       textInstanceIdToken: '',
     }
   },
-  mounted() {
+  async mounted() {
     this.$firebase.auth().onAuthStateChanged(() => {
       console.log('onAuthStateChanged')
     })
-    this.$firestore
+    await this.$firestore
       .collection('shoppinglist')
       .where('display', '==', true)
       .onSnapshot((querySnapshot) => {
@@ -143,6 +147,13 @@ export default Vue.extend({
         })
       })
 
+    const docRef = await this.$firestore.collection('dailynecessaries')
+    docRef.get().then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        this.dailyLists.push(doc.data())
+      })
+    })
+
     if (this.$firebase.messaging.isSupported()) {
       const messaging = this.$firebase.messaging()
       messaging.onMessage((payload) => {
@@ -170,40 +181,45 @@ export default Vue.extend({
       this.isLogin = false
       console.log('signout')
     },
-    handleSignIn() {
+    async handleSignIn(): Promise<void> {
       const provider = new this.$firebase.auth.GoogleAuthProvider()
-      this.$firebase
-        .auth()
-        .signInWithPopup(provider)
-        .then(() => {
-          this.userName = this.$auth.currentUser.displayName || ''
-          this.photoUrl =
-            this.$auth.currentUser.photoURL || PLACE_HOLDER_IMAGE_URL
-          this.isLogin = true
-        })
-        .catch((error) => {
-          const errorCode = error.code
-          const errorMessage = error.message
-          const email = error.email
-          const credential = error.credential
-          console.error(errorCode, errorMessage, email, credential)
-        })
+      try {
+        await this.$firebase.auth().signInWithPopup(provider)
+        this.userName = this.$auth.currentUser.displayName || ''
+        this.photoUrl =
+          this.$auth.currentUser.photoURL || PLACE_HOLDER_IMAGE_URL
+        this.isLogin = true
+      } catch (error) {
+        const errorCode = error.code
+        const errorMessage = error.message
+        const email = error.email
+        const credential = error.credential
+        console.error(errorCode, errorMessage, email, credential)
+      } finally {
+      }
     },
-    handleAddToFirebase(purchasePlanText: String) {
-      const db = this.$firebase.firestore()
-      db.collection('shoppinglist')
-        .add({
-          name: this.userName,
-          title: purchasePlanText,
-          timestamp: this.$firebase.firestore.FieldValue.serverTimestamp(),
-          display: true,
-        })
-        .then((docRef) => {
-          console.log('Document added with ID: ', docRef.id)
-        })
-        .catch((error) => {
-          console.error('Error adding document: ', error)
-        })
+    async handleAddToFirebase(purchasePlanText: String): Promise<void> {
+      try {
+        const result = await this.$firebase
+          .firestore()
+          .collection('shoppinglist')
+          .add({
+            name: this.userName,
+            title: purchasePlanText,
+            timestamp: this.$firebase.firestore.FieldValue.serverTimestamp(),
+            display: true,
+          })
+        console.log('Document added with ID: ', result.id)
+      } catch (e) {
+        console.error('Error adding document: ', e)
+      }
+
+      // .then((docRef) => {
+      //   console.log('Document added with ID: ', docRef.id)
+      // })
+      // .catch((error) => {
+      //   console.error('Error adding document: ', error)
+      // })
     },
     handleIntializedMessaging() {
       const messaging = this.$firebase.messaging()
