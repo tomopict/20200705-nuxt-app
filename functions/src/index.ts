@@ -139,8 +139,11 @@ exports.line = functions
       let tmpText: string = ''
       if (type == 'message') {
         if (message.type == 'text') {
-          const regex = /ほしいもの|欲しいもの/g
-          if (message.text.match(regex)) {
+          const regexWant = /ほしいもの|欲しいもの/g
+          const regexCreate = /追加/g
+          const regexDelete = /買った/g
+
+          if (message.text.match(regexWant)) {
             const shoppingRef = firestore.collection('shoppinglist')
 
             shoppingRef
@@ -168,6 +171,54 @@ exports.line = functions
               .catch((err: any) => {
                 response.status(400).send('NG')
                 console.log('Error getting document', err)
+              })
+          } else if (message.text.match(regexCreate)) {
+            const shoppingRef = firestore.collection('shoppinglist')
+            const title = message.text.replace(regexCreate, '')
+            const data = {
+              title: title,
+              name: '名無し',
+              timestamp: admin.firestore.FieldValue.serverTimestamp(),
+              display: true,
+            }
+            shoppingRef
+              .add(data)
+              .then(function () {
+                console.log('Document written with ID:')
+                response.status(200).send('OK')
+              })
+              .catch(function () {
+                console.error('Error adding document: ')
+                response.status(400).send('NG')
+              })
+          } else if (message.text.match(regexDelete)) {
+            console.log('削除したい')
+
+            const shoppingRef = firestore.collection('shoppinglist')
+            const title = message.text.replace(regexDelete, '')
+
+            shoppingRef
+              .where('title', '==', title)
+              .get()
+              .then((querySnapshot: any) => {
+                querySnapshot.forEach((doc: any) => {
+                  console.log(doc.id)
+                  shoppingRef
+                    .doc(doc.id)
+                    .delete()
+                    .then(function () {
+                      response.status(200).send('OK')
+                      console.log('Document successfully deleted!')
+                    })
+                    .catch(function (error: any) {
+                      response.status(400).send('NG')
+                      console.error('Error removing document: ', error)
+                    })
+                })
+              })
+              .catch(() => {
+                console.error('Error adding document: ')
+                response.status(400).send('NG')
               })
           } else {
             tmpMessage = {
