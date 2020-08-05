@@ -145,55 +145,10 @@ export default Vue.extend({
       dailynecessariesLists,
     }
   },
-  async mounted() {
+  mounted() {
     // this.$firebase.auth().onAuthStateChanged(() => {
     //   console.log('onAuthStateChanged')
     // })
-    await this.$firestore
-      .collection('shoppinglist')
-      .where('display', '==', true)
-      .onSnapshot(async (querySnapshot) => {
-        try {
-          await querySnapshot.docChanges().forEach((change) => {
-            const source: 'Local' | 'Server' = change.doc.metadata
-              .hasPendingWrites
-              ? 'Local'
-              : 'Server'
-
-            // firestoreは書き込みを実行すると、データがバックエンドに送信される前に、新しいデータがリスナーに通知されるため、Localの処理はUI上に反映しない
-            // https://firebase.google.com/docs/firestore/query-data/listen?hl=ja#events-local-changes
-            if (source === 'Local') return
-
-            const formatedList: FormatedList = {
-              title: change.doc.data().title,
-              name: change.doc.data().name,
-              createdAt: this.$dayjs(
-                change.doc.data().createdAt.seconds * 1000
-              ).format('YYYY/MM/DD'),
-              display: change.doc.data().display,
-              id: change.doc.id,
-            }
-
-            if (change.type === 'added') {
-              this.lists.push(formatedList)
-              // console.log('Add Lists: ', change.doc.data())
-            }
-            if (change.type === 'modified') {
-              this.lists.push(formatedList)
-              // console.log('Modified Lists: ', change.doc.data())
-            }
-            if (change.type === 'removed') {
-              const newList = this.lists.filter((list: FormatedList) => {
-                return list.id !== change.doc.id
-              })
-              this.lists = newList
-              console.log('Removed Lists: ', change.doc.data())
-            }
-          })
-        } catch (e) {
-          console.log('somethnig error')
-        }
-      })
 
     if (this.$firebase.messaging.isSupported()) {
       const messaging = this.$firebase.messaging()
@@ -201,8 +156,8 @@ export default Vue.extend({
         console.log('Message received. ', payload)
       })
       this.isMessagingApiSupported = true
-      // messaging.onTokenRefresh(function () {
-      //   messaging.getToken().then(function (refreshedToken) {
+      // messaging.onTokenRefresh(() => {
+      //   messaging.getToken().then((refreshedToken) => {
       //     console.log('refreshedToken', refreshedToken)
       //   })
       // })
@@ -268,13 +223,6 @@ export default Vue.extend({
       } catch (e) {
         console.error('Error adding document: ', e)
       }
-
-      // .then((docRef) => {
-      //   console.log('Document added with ID: ', docRef.id)
-      // })
-      // .catch((error) => {
-      //   console.error('Error adding document: ', error)
-      // })
     },
     handleIntializedMessaging() {
       const messaging = this.$firebase.messaging()
