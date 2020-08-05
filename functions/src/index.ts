@@ -183,7 +183,7 @@ exports.line = functions
             const data = {
               title: title,
               name: '名無し',
-              timestamp: admin.firestore.FieldValue.serverTimestamp(),
+              createdAt: admin.firestore.FieldValue.serverTimestamp(),
               display: true,
             }
             try {
