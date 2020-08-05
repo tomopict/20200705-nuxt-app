@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "nuxt",
-    "build": "nuxt-ts build",
+    "dev": "nuxt-ts",
+    "export": "nuxt-ts build && nuxt-ts export",
+    "build": "nuxt build",
     "start": "nuxt-ts start",
-    "export": "nuxt-ts export",
     "serve": "nuxt-ts serve",
     "lint:js": "eslint --ext .js,.vue --ignore-path .gitignore .",
     "lint:style": "stylelint **/*.{vue,css} --ignore-path .gitignore",
@@ -25,6 +25,7 @@
   "dependencies": {
     "@nuxt/typescript-runtime": "^0.4.10",
     "@nuxtjs/axios": "^5.11.0",
+    "@nuxtjs/dayjs": "^1.1.9",
     "@nuxtjs/pwa": "^3.0.0-beta.20",
     "dotenv": "^8.2.0",
     "firebase": "^7.16.0",
