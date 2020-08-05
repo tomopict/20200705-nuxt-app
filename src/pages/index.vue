@@ -31,10 +31,12 @@
       </div>
     </CommonHeader>
     <main class="p-2">
-      <h1 class="main-title mb-2 mt-2">お買い物リスト</h1>
-
-      <DailyLists :dailyLists="dailyLists"></DailyLists>
-      <ToDolists id="todo-list" :lists="lists"></ToDolists>
+      <DailyLists :dailyLists="dailynecessariesLists"></DailyLists>
+      <ToDolists
+        id="todo-list"
+        :lists="shoppingLists"
+        @delete-item="handleDeleteItem"
+      ></ToDolists>
 
       <div
         class="fixed bottom-0 left-0 w-full p-2 bg-gray-300 flex items-center"
@@ -61,7 +63,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import CommonHeader from '@/components/molecules/commonHeader.vue'
+import CommonHeader from '@/components/organisms/commonHeader.vue'
 import BaseButton from '@/components/atoms/baseButton.vue'
 import ToDolists from '@/components/molecules/todolists.vue'
 import DailyLists from '@/components/molecules/dailyLists.vue'
@@ -69,20 +71,26 @@ import DailyLists from '@/components/molecules/dailyLists.vue'
 interface FormatedList {
   title: String
   name: String
-  writeTime: String
+  createdAt: String | firebase.firestore.FieldValue
   display: Boolean
-  id: String
+  id?: String
 }
 
 interface DataType {
   purchasePlanText: String
   lists: FormatedList[]
+  shoppingLists: FormatedList[]
   dailyLists: any
   userName: String
   photoUrl: String
   isLogin: Boolean
   isMessagingApiSupported: Boolean
   textInstanceIdToken: String
+}
+
+type Result = {
+  shoppingLists: FormatedList[]
+  dailynecessariesLists: firebase.firestore.DocumentData
 }
 
 const PLACE_HOLDER_IMAGE_URL = '/placeholder.png'
@@ -93,6 +101,7 @@ export default Vue.extend({
     return {
       purchasePlanText: '',
       lists: [],
+      shoppingLists: [],
       dailyLists: [],
       userName: '名無し',
       photoUrl: PLACE_HOLDER_IMAGE_URL,
@@ -101,58 +110,90 @@ export default Vue.extend({
       textInstanceIdToken: '',
     }
   },
-  async mounted() {
-    this.$firebase.auth().onAuthStateChanged(() => {
-      console.log('onAuthStateChanged')
+  async asyncData({ app }): Promise<Result> {
+    const shoppingRef = app.$firestore.collection('shoppinglist')
+    const dailynecessariesRef = app.$firestore.collection('dailynecessaries')
+    const [shoppingSnapshot, dailynecessariesSnapshot] = await Promise.all([
+      shoppingRef.where('display', '==', true).get(),
+      dailynecessariesRef.get(),
+    ])
+
+    /** TODO
+     * orderbyするためにindexをはる
+     * https://ginpen.com/2019/06/01/firestore-indexes-json/
+     */
+
+    const shoppingLists = shoppingSnapshot.docs.map((doc) => {
+      const formatedList: FormatedList = {
+        title: doc.data().title,
+        name: doc.data().name,
+        createdAt: app
+          .$dayjs(doc.data().createdAt.seconds * 1000)
+          .format('YYYY/MM/DD/ hh:mm'),
+        display: doc.data().display,
+        id: doc.id,
+      }
+      return formatedList
     })
+
+    const dailynecessariesLists = dailynecessariesSnapshot.docs.map((doc) => {
+      return doc.data()
+    })
+
+    return {
+      shoppingLists,
+      dailynecessariesLists,
+    }
+  },
+  async mounted() {
+    // this.$firebase.auth().onAuthStateChanged(() => {
+    //   console.log('onAuthStateChanged')
+    // })
     await this.$firestore
       .collection('shoppinglist')
       .where('display', '==', true)
-      .onSnapshot((querySnapshot) => {
-        querySnapshot.docChanges().forEach((change) => {
-          const source: 'Local' | 'Server' = change.doc.metadata
-            .hasPendingWrites
-            ? 'Local'
-            : 'Server'
+      .onSnapshot(async (querySnapshot) => {
+        try {
+          await querySnapshot.docChanges().forEach((change) => {
+            const source: 'Local' | 'Server' = change.doc.metadata
+              .hasPendingWrites
+              ? 'Local'
+              : 'Server'
 
-          // firestoreは書き込みを実行すると、データがバックエンドに送信される前に、新しいデータがリスナーに通知されるため、Localの処理はUI上に反映しない
-          // https://firebase.google.com/docs/firestore/query-data/listen?hl=ja#events-local-changes
-          if (source === 'Local') return
+            // firestoreは書き込みを実行すると、データがバックエンドに送信される前に、新しいデータがリスナーに通知されるため、Localの処理はUI上に反映しない
+            // https://firebase.google.com/docs/firestore/query-data/listen?hl=ja#events-local-changes
+            if (source === 'Local') return
 
-          const formatedList: FormatedList = {
-            title: change.doc.data().title,
-            name: change.doc.data().name,
-            writeTime: this.$dayjs(
-              change.doc.data().timestamp.seconds * 1000
-            ).format('YYYY/MM/DD'),
-            display: change.doc.data().display,
-            id: change.doc.id,
-          }
+            const formatedList: FormatedList = {
+              title: change.doc.data().title,
+              name: change.doc.data().name,
+              createdAt: this.$dayjs(
+                change.doc.data().createdAt.seconds * 1000
+              ).format('YYYY/MM/DD'),
+              display: change.doc.data().display,
+              id: change.doc.id,
+            }
 
-          if (change.type === 'added') {
-            this.lists.push(formatedList)
-            console.log('Add Lists: ', change.doc.data())
-          }
-          if (change.type === 'modified') {
-            this.lists.push(formatedList)
-            console.log('Modified Lists: ', change.doc.data())
-          }
-          if (change.type === 'removed') {
-            const newList = this.lists.filter((list: FormatedList) => {
-              return list.id !== change.doc.id
-            })
-            this.lists = newList
-            console.log('Removed Lists: ', change.doc.data())
-          }
-        })
+            if (change.type === 'added') {
+              this.lists.push(formatedList)
+              // console.log('Add Lists: ', change.doc.data())
+            }
+            if (change.type === 'modified') {
+              this.lists.push(formatedList)
+              // console.log('Modified Lists: ', change.doc.data())
+            }
+            if (change.type === 'removed') {
+              const newList = this.lists.filter((list: FormatedList) => {
+                return list.id !== change.doc.id
+              })
+              this.lists = newList
+              console.log('Removed Lists: ', change.doc.data())
+            }
+          })
+        } catch (e) {
+          console.log('somethnig error')
+        }
       })
-
-    const docRef = await this.$firestore.collection('dailynecessaries')
-    docRef.get().then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        this.dailyLists.push(doc.data())
-      })
-    })
 
     if (this.$firebase.messaging.isSupported()) {
       const messaging = this.$firebase.messaging()
@@ -168,6 +209,17 @@ export default Vue.extend({
     }
   },
   methods: {
+    handleAddItem(data: FormatedList) {
+      data.createdAt = this.$dayjs().format('YYYY/MM/DD hh:mm')
+      this.shoppingLists.push(data)
+    },
+    handleDeleteItem(docid: string) {
+      const newList = this.shoppingLists.filter((list: FormatedList) => {
+        return list.id !== docid
+      })
+      this.shoppingLists = newList
+      console.log('handleDeleteItem', event)
+    },
     handleAddShoppingList() {
       if (!this.purchasePlanText) return
       this.handleAddToFirebase(this.purchasePlanText)
@@ -200,16 +252,19 @@ export default Vue.extend({
     },
     async handleAddToFirebase(purchasePlanText: String): Promise<void> {
       try {
+        const data: FormatedList = {
+          name: this.userName,
+          title: purchasePlanText,
+          createdAt: this.$firebase.firestore.FieldValue.serverTimestamp(),
+          display: true,
+        }
         const result = await this.$firebase
           .firestore()
           .collection('shoppinglist')
-          .add({
-            name: this.userName,
-            title: purchasePlanText,
-            timestamp: this.$firebase.firestore.FieldValue.serverTimestamp(),
-            display: true,
-          })
-        console.log('Document added with ID: ', result.id)
+          .add(data)
+        console.log('Document added with ID: ', result)
+        data.id = result.id
+        this.handleAddItem(data)
       } catch (e) {
         console.error('Error adding document: ', e)
       }
