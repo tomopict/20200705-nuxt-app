@@ -1,0 +1,15 @@
+{
+  "events": [
+    {
+      "type": "message",
+      "replyToken": "efc1345af8414b01a44798a1b99f49ec",
+      "createdAt": 1596202009987,
+      "mode": "active",
+      "message": {
+        "type": "text",
+        "text": "ほしいもの"
+      }
+    }
+  ],
+  "destination": "U53230a5d8394d8abf1dbca65b1a52bc0"
+}

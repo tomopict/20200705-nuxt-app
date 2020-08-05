@@ -33,6 +33,10 @@ function initialize(app: any) {
   }
 }
 
+/**
+ * TODO:Nuxt exportの時errorになるので対応が必要
+ **/
+// https://github.com/nuxt-community/firebase-module/issues/90
 export const firebase = _firebase
 export const firestore = app.firestore()
 // export const storage = app.storage()
