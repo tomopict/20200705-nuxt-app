@@ -18,7 +18,7 @@
       <div class="flex-1">
         <p class="w-100 text-lg font-semibold">{{ list.title }}</p>
         <p class="flex justify-between text-xs">
-          <span class="text-red-300">{{ list.writeTime }}</span>
+          <span class="text-red-300">{{ list.createdAt }}</span>
           <span class="text-gray-400">{{ list.name }}</span>
         </p>
       </div>
@@ -49,6 +49,7 @@ export default Vue.extend({
         .delete()
         .then(() => {
           console.log('delete success', id)
+          this.$emit('delete-item', id)
         })
         .catch((error) => {
           console.log('delete error', error)
