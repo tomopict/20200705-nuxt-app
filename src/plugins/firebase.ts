@@ -21,7 +21,12 @@ declare module '@nuxt/types' {
     $analytics: firebase.analytics.Analytics
   }
 }
-
+/**
+ * veturが0.26.1になってからエラーが発生してbuildできず
+ * TODO:veturのupdate後に外して動作確認
+ * 20200809
+ */
+// @ts-ignore
 declare module 'vue/types/vue' {
   interface Vue {
     $auth: firebase.auth.Auth & {
