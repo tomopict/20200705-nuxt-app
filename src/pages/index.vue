@@ -152,7 +152,7 @@ export default Vue.extend({
 
     if (this.$firebase.messaging.isSupported()) {
       const messaging = this.$firebase.messaging()
-      messaging.onMessage((payload) => {
+      messaging.onMessage((payload: any) => {
         console.log('Message received. ', payload)
       })
       this.isMessagingApiSupported = true
@@ -251,7 +251,7 @@ export default Vue.extend({
                 .then(() => {
                   console.log('Document successfully written!')
                 })
-                .catch((error) => {
+                .catch((error: any) => {
                   console.error('Error adding document: ', error)
                 })
             })
@@ -269,19 +269,19 @@ export default Vue.extend({
       const messaging = this.$firebase.messaging()
       messaging
         .getToken()
-        .then((currentToken) => {
+        .then((currentToken: string) => {
           messaging
             .deleteToken(currentToken)
             .then(() => {
               console.log('tokenを削除')
               this.textInstanceIdToken = ''
             })
-            .catch((err) => {
+            .catch((err: any) => {
               this.textInstanceIdToken =
                 'トークンの取得に失敗しました（' + err + '）。'
             })
         })
-        .catch((err) => {
+        .catch((err: any) => {
           this.textInstanceIdToken =
             'トークンの取得に失敗しました（' + err + '）。'
         })
