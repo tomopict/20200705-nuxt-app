@@ -1,37 +1,41 @@
 <template>
   <div class="container">
-    <CommonHeader :userName="userName" :photoUrl="photoUrl">
+    <Header :user-name="userName" :photo-url="photoUrl">
       <div>
         <BaseButton
           v-if="!isLogin"
-          @click.native="handleSignIn"
           :class="'text-xs border-gray-600 border'"
-          >ログイン</BaseButton
+          @click.native="handleSignIn"
         >
+          ログイン
+        </BaseButton>
         <BaseButton
           v-else
-          @click.native="handleSignOut"
           :class="'text-xs border-gray-600 border'"
-          >ログアウト</BaseButton
+          @click.native="handleSignOut"
         >
+          ログアウト
+        </BaseButton>
         <template v-if="isMessagingApiSupported">
           <BaseButton
             v-if="!textInstanceIdToken"
-            @click.native="handleIntializedMessaging"
             :class="'text-xs border-gray-600 border'"
-            >認証</BaseButton
+            @click.native="handleIntializedMessaging"
           >
+            認証
+          </BaseButton>
           <BaseButton
             v-else
-            @click.native="handleDeleteToken"
             :class="'text-xs border-gray-600 border'"
-            >認証解消</BaseButton
+            @click.native="handleDeleteToken"
           >
+            認証解消
+          </BaseButton>
         </template>
       </div>
-    </CommonHeader>
+    </Header>
     <main class="p-2">
-      <DailyLists :dailyLists="dailynecessariesLists"></DailyLists>
+      <DailyLists :daily-lists="dailynecessariesLists"></DailyLists>
       <ToDolists
         id="todo-list"
         :lists="shoppingLists"
@@ -48,14 +52,15 @@
           placeholder="買いたいものを入れてよ"
         />
         <BaseButton
-          @click.native="handleAddShoppingList"
           :style="{
             color: 'white',
             height: '40px',
           }"
           class="bg-green-500"
-          >追加</BaseButton
+          @click.native="handleAddShoppingList"
         >
+          追加
+        </BaseButton>
       </div>
     </main>
   </div>
@@ -63,10 +68,10 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import CommonHeader from '@/components/organisms/commonHeader.vue'
-import BaseButton from '@/components/atoms/baseButton.vue'
-import ToDolists from '@/components/molecules/todolists.vue'
-import DailyLists from '@/components/molecules/dailyLists.vue'
+import Header from '@/components/organisms/Header.vue'
+import BaseButton from '@/components/atoms/BaseButton.vue'
+import ToDolists from '@/components/molecules/Todolists.vue'
+import DailyLists from '@/components/molecules/DailyLists.vue'
 
 interface FormatedList {
   title: String
@@ -96,20 +101,7 @@ type Result = {
 const PLACE_HOLDER_IMAGE_URL = '/placeholder.png'
 
 export default Vue.extend({
-  components: { ToDolists, CommonHeader, BaseButton, DailyLists },
-  data(): DataType {
-    return {
-      purchasePlanText: '',
-      lists: [],
-      shoppingLists: [],
-      dailyLists: [],
-      userName: '名無し',
-      photoUrl: PLACE_HOLDER_IMAGE_URL,
-      isLogin: false,
-      isMessagingApiSupported: false,
-      textInstanceIdToken: '',
-    }
-  },
+  components: { ToDolists, Header, BaseButton, DailyLists },
   async asyncData({ app }): Promise<Result> {
     const shoppingRef = app.$firestore.collection('shoppinglist')
     const dailynecessariesRef = app.$firestore.collection('dailynecessaries')
@@ -122,7 +114,6 @@ export default Vue.extend({
      * orderbyするためにindexをはる
      * https://ginpen.com/2019/06/01/firestore-indexes-json/
      */
-
     const shoppingLists = shoppingSnapshot.docs.map((doc) => {
       const formatedList: FormatedList = {
         title: doc.data().title,
@@ -143,6 +134,19 @@ export default Vue.extend({
     return {
       shoppingLists,
       dailynecessariesLists,
+    }
+  },
+  data(): DataType {
+    return {
+      purchasePlanText: '',
+      lists: [],
+      shoppingLists: [],
+      dailyLists: [],
+      userName: '名無し',
+      photoUrl: PLACE_HOLDER_IMAGE_URL,
+      isLogin: false,
+      isMessagingApiSupported: false,
+      textInstanceIdToken: '',
     }
   },
   mounted() {

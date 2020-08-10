@@ -10,8 +10,8 @@
         type="p"
         role="checkbox"
         aria-checked="false"
-        @click="handleDeletePurchaseData(list.id)"
         class="mr-2 text-sm underline"
+        @click="handleDeletePurchaseData(list.id)"
       >
         購入
       </button>
@@ -30,18 +30,18 @@
 import Vue from 'vue'
 
 export default Vue.extend({
+  props: {
+    lists: {
+      type: Array,
+      required: false,
+    },
+  },
   data(): {
     isLogin: boolean
   } {
     return {
       isLogin: false,
     }
-  },
-  props: {
-    lists: {
-      type: Array,
-      required: false,
-    },
   },
   methods: {
     async handleDeletePurchaseData(id: string): Promise<void> {

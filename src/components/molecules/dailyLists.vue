@@ -5,8 +5,8 @@
       <li v-for="list in dailyLists" :key="list.value">
         <label class="switch">
           <input
-            type="checkbox"
             v-model="list.status"
+            type="checkbox"
             @change="handleChangeDailyItemStatus(list.value, list.status)"
           />
           {{ list.label }}
