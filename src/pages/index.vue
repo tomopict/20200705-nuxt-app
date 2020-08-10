@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <Header :user-name="userName" :photo-url="photoUrl">
-      <div>
+      <div class="flex">
         <BaseButton
           v-if="!isLogin"
           :class="'text-xs border-gray-600 border'"
@@ -17,20 +17,7 @@
           ログアウト
         </BaseButton>
         <template v-if="isMessagingApiSupported">
-          <BaseButton
-            v-if="!textInstanceIdToken"
-            :class="'text-xs border-gray-600 border'"
-            @click.native="handleIntializedMessaging"
-          >
-            認証
-          </BaseButton>
-          <BaseButton
-            v-else
-            :class="'text-xs border-gray-600 border'"
-            @click.native="handleDeleteToken"
-          >
-            認証解消
-          </BaseButton>
+          <AuthenticationItems :user-name="userName"></AuthenticationItems>
         </template>
       </div>
     </Header>
@@ -72,6 +59,7 @@ import Header from '@/components/organisms/Header.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
 import ToDolists from '@/components/molecules/Todolists.vue'
 import DailyLists from '@/components/molecules/DailyLists.vue'
+import AuthenticationItems from '@/components/molecules/AuthenticationItems.vue'
 
 interface FormatedList {
   title: String
@@ -90,7 +78,6 @@ interface DataType {
   photoUrl: String
   isLogin: Boolean
   isMessagingApiSupported: Boolean
-  textInstanceIdToken: String
 }
 
 type Result = {
@@ -101,7 +88,13 @@ type Result = {
 const PLACE_HOLDER_IMAGE_URL = '/placeholder.png'
 
 export default Vue.extend({
-  components: { ToDolists, Header, BaseButton, DailyLists },
+  components: {
+    ToDolists,
+    Header,
+    BaseButton,
+    DailyLists,
+    AuthenticationItems,
+  },
   async asyncData({ app }): Promise<Result> {
     const shoppingRef = app.$firestore.collection('shoppinglist')
     const dailynecessariesRef = app.$firestore.collection('dailynecessaries')
@@ -146,7 +139,6 @@ export default Vue.extend({
       photoUrl: PLACE_HOLDER_IMAGE_URL,
       isLogin: false,
       isMessagingApiSupported: false,
-      textInstanceIdToken: '',
     }
   },
   mounted() {
@@ -227,68 +219,6 @@ export default Vue.extend({
       } catch (e) {
         console.error('Error adding document: ', e)
       }
-    },
-    handleIntializedMessaging() {
-      const messaging = this.$firebase.messaging()
-      // @ts-ignore
-      if (!messaging.vapidKey) {
-        messaging.usePublicVapidKey(process.env.FIREBASE_PUBLIC_VAPID_KEY || '')
-      }
-      this.requestPermission(messaging)
-    },
-    requestPermission(messaging: firebase.messaging.Messaging) {
-      messaging
-        .requestPermission()
-        .then(() => {
-          messaging
-            .getToken()
-            .then((token: String) => {
-              this.textInstanceIdToken = token
-
-              const db = this.$firebase.firestore()
-              db.collection('users')
-                .doc(this.userName.toString())
-                .set({
-                  fcmToken: token,
-                  name: this.userName,
-                })
-                .then(() => {
-                  console.log('Document successfully written!')
-                })
-                .catch((error: any) => {
-                  console.error('Error adding document: ', error)
-                })
-            })
-            .catch((err: any) => {
-              this.textInstanceIdToken =
-                'トークンの取得に失敗しました（' + err + '）。'
-            })
-        })
-        .catch((err: any) => {
-          this.textInstanceIdToken =
-            '通知の許可が得られませんでした（' + err + '）。'
-        })
-    },
-    handleDeleteToken() {
-      const messaging = this.$firebase.messaging()
-      messaging
-        .getToken()
-        .then((currentToken: string) => {
-          messaging
-            .deleteToken(currentToken)
-            .then(() => {
-              console.log('tokenを削除')
-              this.textInstanceIdToken = ''
-            })
-            .catch((err: any) => {
-              this.textInstanceIdToken =
-                'トークンの取得に失敗しました（' + err + '）。'
-            })
-        })
-        .catch((err: any) => {
-          this.textInstanceIdToken =
-            'トークンの取得に失敗しました（' + err + '）。'
-        })
     },
   },
 })
