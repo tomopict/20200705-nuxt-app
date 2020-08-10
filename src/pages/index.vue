@@ -193,12 +193,7 @@ export default Vue.extend({
           this.$auth.currentUser.photoURL || PLACE_HOLDER_IMAGE_URL
         this.isLogin = true
       } catch (error) {
-        const errorCode = error.code
-        const errorMessage = error.message
-        const email = error.email
-        const credential = error.credential
-        console.error(errorCode, errorMessage, email, credential)
-      } finally {
+        console.error(error)
       }
     },
     async handleAddToFirebase(purchasePlanText: String): Promise<void> {
