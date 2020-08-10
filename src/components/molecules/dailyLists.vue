@@ -31,17 +31,18 @@ export default Vue.extend({
       value: string,
       status: boolean
     ): Promise<void> {
-      const db = await this.$firebase.firestore()
+      const db = await this.$firebase.firestore().collection('dailynecessaries')
       const data = {
         status,
       }
       try {
-        db.collection('dailynecessaries').doc(value).update(data)
-        console.log('Update success')
+        db.doc(value).update(data)
+        console.log('Update success dailynecessaries')
       } catch (err) {
-        console.log('Update error', err)
+        console.log('Update error dailynecessaries', err)
+      } finally {
+        console.log('Done dailynecessaries')
       }
-      console.log('handleChangeDailyItemStatus')
     },
   },
 })

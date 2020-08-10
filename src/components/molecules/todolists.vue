@@ -30,7 +30,9 @@
 import Vue from 'vue'
 
 export default Vue.extend({
-  data() {
+  data(): {
+    isLogin: boolean
+  } {
     return {
       isLogin: false,
     }
@@ -42,10 +44,9 @@ export default Vue.extend({
     },
   },
   methods: {
-    handleDeletePurchaseData(id: string): void {
-      const db = this.$firebase.firestore()
-      db.collection('shoppinglist')
-        .doc(id)
+    async handleDeletePurchaseData(id: string): Promise<void> {
+      const db = await this.$firebase.firestore().collection('shoppinglist')
+      db.doc(id)
         .delete()
         .then(() => {
           console.log('delete success', id)
