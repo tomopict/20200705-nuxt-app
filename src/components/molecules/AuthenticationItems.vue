@@ -40,38 +40,33 @@ export default Vue.extend({
       }
       this.requestPermission(messaging)
     },
-    requestPermission(messaging: firebase.messaging.Messaging) {
-      messaging
-        .requestPermission()
-        .then(() => {
-          messaging
-            .getToken()
-            .then((token: String) => {
-              this.textInstanceIdToken = token
+    async requestPermission(messaging: firebase.messaging.Messaging) {
+      try {
+        await messaging.requestPermission()
+        messaging
+          .getToken()
+          .then(async (token: String) => {
+            this.textInstanceIdToken = token
 
-              const db = this.$firebase.firestore()
-              db.collection('users')
-                .doc(this.userName.toString())
-                .set({
-                  fcmToken: token,
-                  name: this.userName,
-                })
-                .then(() => {
-                  console.log('Document successfully written!')
-                })
-                .catch((error: any) => {
-                  console.error('Error adding document: ', error)
-                })
-            })
-            .catch((err: any) => {
-              this.textInstanceIdToken =
-                'トークンの取得に失敗しました（' + err + '）。'
-            })
-        })
-        .catch((err: any) => {
-          this.textInstanceIdToken =
-            '通知の許可が得られませんでした（' + err + '）。'
-        })
+            const db = await this.$firebase.firestore().collection('users')
+            try {
+              db.doc(this.userName.toString()).set({
+                fcmToken: token,
+                name: this.userName,
+              })
+              console.log('Document successfully written!')
+            } catch (err) {
+              console.error('Error adding document: ', err)
+            }
+          })
+          .catch((err: any) => {
+            this.textInstanceIdToken =
+              'トークンの取得に失敗しました（' + err + '）。'
+          })
+      } catch (err) {
+        this.textInstanceIdToken =
+          '通知の許可が得られませんでした（' + err + '）。'
+      }
     },
     handleDeleteToken() {
       const messaging = this.$firebase.messaging()
