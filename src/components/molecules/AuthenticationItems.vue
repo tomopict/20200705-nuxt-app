@@ -1,5 +1,5 @@
 <template>
-  <div class="ml-2">
+  <div>
     <BaseButton
       v-if="!textInstanceIdToken"
       :class="'text-xs border-gray-600 border'"

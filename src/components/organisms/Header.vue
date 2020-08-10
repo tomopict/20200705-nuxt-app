@@ -9,13 +9,18 @@
       </li>
     </ul>
     <slot />
+    <template v-if="supported">
+      <AuthenticationItems :user-name="userName"></AuthenticationItems>
+    </template>
   </header>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
+import AuthenticationItems from '@/components/molecules/AuthenticationItems.vue'
 
 export default Vue.extend({
+  components: { AuthenticationItems },
   props: {
     userName: {
       type: String,
@@ -24,6 +29,9 @@ export default Vue.extend({
     photoUrl: {
       type: String,
       required: true,
+    },
+    supported: {
+      type: Boolean,
     },
   },
 })

@@ -1,6 +1,10 @@
 <template>
   <div class="container">
-    <Header :user-name="userName" :photo-url="photoUrl">
+    <Header
+      :user-name="userName"
+      :photo-url="photoUrl"
+      :supported="isMessagingApiSupported"
+    >
       <div class="flex">
         <BaseButton
           v-if="!isLogin"
@@ -16,9 +20,6 @@
         >
           ログアウト
         </BaseButton>
-        <template v-if="isMessagingApiSupported">
-          <AuthenticationItems :user-name="userName"></AuthenticationItems>
-        </template>
       </div>
     </Header>
     <main class="p-2">
@@ -59,7 +60,6 @@ import Header from '@/components/organisms/Header.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
 import ToDolists from '@/components/molecules/Todolists.vue'
 import DailyLists from '@/components/molecules/DailyLists.vue'
-import AuthenticationItems from '@/components/molecules/AuthenticationItems.vue'
 
 interface FormatedList {
   title: String
@@ -93,7 +93,6 @@ export default Vue.extend({
     Header,
     BaseButton,
     DailyLists,
-    AuthenticationItems,
   },
   async asyncData({ app }): Promise<Result> {
     const shoppingRef = app.$firestore.collection('shoppinglist')
