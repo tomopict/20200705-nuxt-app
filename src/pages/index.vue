@@ -4,7 +4,7 @@
       :user-name="userName"
       :photo-url="photoUrl"
       :supported="isMessagingApiSupported"
-      :is-login="isLogin"
+      :isLogin="isLogin"
       @handleSignIn="handleSignIn"
       @handleSignOut="handleSignOut"
     ></Header>
