@@ -111,11 +111,18 @@ export default Vue.extend({
         title: doc.data().title,
         name: doc.data().name,
         createdAt: app
-          .$dayjs(doc.data().createdAt.seconds * 1000)
-          .format('YYYY/MM/DD/ hh:mm'),
+          .$dayjs(
+            doc
+              .data()
+              .createdAt.toDate()
+              .toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })
+          )
+          .format('YYYY/MM/DD HH:mm'),
         display: doc.data().display,
         id: doc.id,
       }
+      console.log(doc.data()!.createdAt.toDate())
+
       return formatedList
     })
 
@@ -160,7 +167,7 @@ export default Vue.extend({
   },
   methods: {
     handleAddItem(data: FormatedList) {
-      data.createdAt = this.$dayjs().format('YYYY/MM/DD hh:mm')
+      data.createdAt = this.$dayjs().format('YYYY/MM/DD HH:mm')
       this.shoppingLists.push(data)
     },
     handleDeleteItem(docid: string) {
