@@ -8,17 +8,17 @@
         <img :src="photoUrl" />
       </li>
     </ul>
-    <slot />
-    <div class="flex">
+    <dir class="flex">
       <SingInUser
         :isLogin="isLogin"
         @emitHeaderSignIn="emitHeaderSignIn"
-        @emitHeaderSignOut="emitHeaderSignOut"
+        @emitHeaderSignOut="emitHeaderSignOur"
+        :class="'mr-2'"
       ></SingInUser>
-    </div>
-    <template v-if="supported">
-      <AuthenticationItems :user-name="userName"></AuthenticationItems>
-    </template>
+      <template v-if="supported">
+        <AuthenticationItems :user-name="userName"></AuthenticationItems>
+      </template>
+    </dir>
   </header>
 </template>
 
