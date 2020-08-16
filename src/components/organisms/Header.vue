@@ -9,6 +9,13 @@
       </li>
     </ul>
     <slot />
+    <div class="flex">
+      <SingInUser
+        :isLogin="isLogin"
+        @emitHeaderSignIn="emitHeaderSignIn"
+        @emitHeaderSignOut="emitHeaderSignOut"
+      ></SingInUser>
+    </div>
     <template v-if="supported">
       <AuthenticationItems :user-name="userName"></AuthenticationItems>
     </template>
@@ -18,9 +25,10 @@
 <script lang="ts">
 import Vue from 'vue'
 import AuthenticationItems from '@/components/molecules/AuthenticationItems.vue'
+import SingInUser from '@/components/molecules/SingInUser.vue'
 
 export default Vue.extend({
-  components: { AuthenticationItems },
+  components: { AuthenticationItems, SingInUser },
   props: {
     userName: {
       type: String,
@@ -32,6 +40,18 @@ export default Vue.extend({
     },
     supported: {
       type: Boolean,
+    },
+    isLogin: {
+      type: Boolean,
+      required: true,
+    },
+  },
+  methods: {
+    emitHeaderSignIn() {
+      this.$emit('handleSignIn')
+    },
+    emitHeaderSignOut() {
+      this.$emit('handleSignOut')
     },
   },
 })

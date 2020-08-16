@@ -4,24 +4,10 @@
       :user-name="userName"
       :photo-url="photoUrl"
       :supported="isMessagingApiSupported"
-    >
-      <div class="flex">
-        <BaseButton
-          v-if="!isLogin"
-          :class="'text-xs border-gray-600 border'"
-          @click.native="handleSignIn"
-        >
-          ログイン
-        </BaseButton>
-        <BaseButton
-          v-else
-          :class="'text-xs border-gray-600 border'"
-          @click.native="handleSignOut"
-        >
-          ログアウト
-        </BaseButton>
-      </div>
-    </Header>
+      :is-login="isLogin"
+      @handleSignIn="handleSignIn"
+      @handleSignOut="handleSignOut"
+    ></Header>
     <main class="p-2">
       <DailyLists :daily-lists="dailynecessariesLists"></DailyLists>
       <ToDolists
@@ -177,18 +163,17 @@ export default Vue.extend({
       this.shoppingLists = newList
       console.log('handleDeleteItem', event)
     },
-    handleAddShoppingList() {
+    handleAddShoppingList(): void {
       if (!this.purchasePlanText) return
       this.handleAddToFirebase(this.purchasePlanText)
       this.purchasePlanText = ''
     },
-    handleSignOut() {
+    handleSignOut(): void {
       this.isLogin = false
       this.$firebase.auth().signOut()
       this.userName = '名無し'
       this.photoUrl = PLACE_HOLDER_IMAGE_URL
       this.isLogin = false
-      console.log('signout')
     },
     async handleSignIn(): Promise<void> {
       const provider = new this.$firebase.auth.GoogleAuthProvider()
