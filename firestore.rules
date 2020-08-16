@@ -15,12 +15,15 @@ service cloud.firestore {
       //allow read, write: if request.time < timestamp.date(2020, 8, 18);
     //}
     match /shoppinglist/{messageId} {
+      allow read, create, update, delete;
+    }
+    match /users/{messageId} {
       allow read;
-      allow create, update: if request.auth != null
-                    && request.resource.data.name == request.auth.token.name
-                    && (request.resource.data.title is string
-                    && request.resource.data.title.size() <= 300);
-      allow delete: if false;
+      allow create, update, delete: if request.auth != null;
+    }
+    match /dailynecessaries/{messageId} {
+      allow read, update;
+      allow create: if request.auth != null;
     }
   }
 }
