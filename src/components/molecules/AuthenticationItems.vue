@@ -25,7 +25,7 @@ export default Vue.extend({
     userName: String,
   },
   data(): {
-    textInstanceIdToken: String
+    textInstanceIdToken: string
   } {
     return {
       textInstanceIdToken: '',
@@ -45,7 +45,7 @@ export default Vue.extend({
         await messaging.requestPermission()
         messaging
           .getToken()
-          .then(async (token: String) => {
+          .then(async (token: string) => {
             this.textInstanceIdToken = token
 
             const db = await this.$firebase.firestore().collection('users')
