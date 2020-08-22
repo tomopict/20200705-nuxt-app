@@ -47,6 +47,8 @@ import BaseButton from '@/components/atoms/BaseButton.vue'
 import ToDolists from '@/components/molecules/Todolists.vue'
 import DailyLists from '@/components/molecules/DailyLists.vue'
 
+import { dateToStringJa } from '@/utils/filters'
+
 interface DailynecessariesList {
   label: String
   lastPurchased?: string
@@ -105,12 +107,7 @@ export default Vue.extend({
         title: doc.data().title,
         name: doc.data().name,
         createdAt: app
-          .$dayjs(
-            doc
-              .data()
-              .createdAt.toDate()
-              .toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })
-          )
+          .$dayjs(dateToStringJa(doc.data().createdAt.toDate()))
           .format('YYYY/MM/DD HH:mm'),
         display: doc.data().display,
         id: doc.id,
@@ -122,11 +119,7 @@ export default Vue.extend({
       (doc) => {
         const LastPurchased: string = app
           .$dayjs(
-            doc
-              .data()
-              .purchaseHistory.slice(-1)[0]
-              .toDate()
-              .toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })
+            dateToStringJa(doc.data().purchaseHistory.slice(-1)[0].toDate())
           )
           .format('YYYY/MM/DD HH:mm')
 
