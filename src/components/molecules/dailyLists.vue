@@ -1,9 +1,8 @@
 <template>
   <div class="border p-2 mb-5">
-    <p>いつもの</p>
     <ul class="daily-lists">
-      <li v-for="list in dailyLists" :key="list.value">
-        <label class="switch">
+      <li v-for="list in dailynecessariesList" :key="list.value">
+        <label class="switch block w-full text-sm">
           <input
             v-model="list.status"
             type="checkbox"
@@ -16,10 +15,10 @@
             "
           />
           {{ list.label }}
+          <span class="text-xs block text-gray-400">
+            {{ list.lastPurchased }}
+          </span>
         </label>
-        <span>
-          {{ list.lastPurchased }}
-        </span>
       </li>
     </ul>
   </div>
@@ -42,7 +41,7 @@ interface DailyLists {
 
 export default Vue.extend({
   props: {
-    dailyLists: {
+    dailynecessariesList: {
       type: Array as () => DailyLists[],
       required: false,
     },
@@ -76,6 +75,7 @@ export default Vue.extend({
         status,
         purchaseHistory: purchasedAtConvertToTimestamp,
       }
+      console.log(value, data)
       try {
         db.doc(value).update(data)
         console.log('Update success dailynecessaries')
@@ -92,7 +92,8 @@ export default Vue.extend({
 .daily {
   &-lists {
     display: grid;
-    grid-template-columns: 33% 33% 1fr;
+    grid-template-columns: 20% 20% 20% 20% 20%;
+    row-gap: 5px;
   }
 }
 </style>
