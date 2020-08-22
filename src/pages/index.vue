@@ -9,12 +9,12 @@
       @handleSignOut="handleSignOut"
     ></Header>
     <main class="p-2">
-      <DailyLists :daily-lists="dailynecessariesList"></DailyLists>
-      <ToDolists
+      <DailyList :daily-lists="dailynecessariesList"></DailyList>
+      <ToDolist
         id="todo-list"
         :lists="shoppingLists"
         @delete-item="handleDeleteItem"
-      ></ToDolists>
+      ></ToDolist>
 
       <div
         class="fixed bottom-0 left-0 w-full p-2 bg-gray-300 flex items-center"
@@ -44,24 +44,24 @@
 import Vue from 'vue'
 import Header from '@/components/organisms/Header.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
-import ToDolists from '@/components/molecules/Todolists.vue'
-import DailyLists from '@/components/molecules/DailyLists.vue'
+import ToDolist from '@/components/molecules/TodoList.vue'
+import DailyList from '@/components/molecules/DailyList.vue'
 
 import { dateToStringJa } from '@/utils/filters'
 
 interface DailynecessariesList {
-  label: String
+  label: string
   lastPurchased?: string
   purchaseHistory: string | Array<firebase.firestore.FieldValue>
-  status: Boolean
+  status: boolean
   value: string
 }
 
 interface FormatedList {
-  title: String
+  title: string
   name: string
   createdAt: string | firebase.firestore.FieldValue
-  display: Boolean
+  display: boolean
   id?: string
 }
 
@@ -69,7 +69,6 @@ interface DataType {
   purchasePlanText: string
   lists: FormatedList[]
   shoppingLists: FormatedList[]
-  dailyLists: any
   userName: string
   photoUrl: string
   isLogin: boolean
@@ -85,10 +84,10 @@ const PLACE_HOLDER_IMAGE_URL = '/placeholder.png'
 
 export default Vue.extend({
   components: {
-    ToDolists,
+    ToDolist,
     Header,
     BaseButton,
-    DailyLists,
+    DailyList,
   },
   async asyncData({ app }): Promise<Result> {
     const shoppingRef = app.$firestore.collection('shoppinglist')
@@ -121,9 +120,9 @@ export default Vue.extend({
           .$dayjs(
             dateToStringJa(doc.data().purchaseHistory.slice(-1)[0].toDate())
           )
-          .format('YYYY/MM/DD HH:mm')
+          .format('YY/MM/DD')
 
-        const formatedList: any = {
+        const formatedList: DailynecessariesList = {
           label: doc.data().label,
           lastPurchased: LastPurchased,
           purchaseHistory: doc.data().purchaseHistory,
@@ -144,7 +143,6 @@ export default Vue.extend({
       purchasePlanText: '',
       lists: [],
       shoppingLists: [],
-      dailyLists: [],
       userName: '名無し',
       photoUrl: PLACE_HOLDER_IMAGE_URL,
       isLogin: false,
@@ -205,7 +203,7 @@ export default Vue.extend({
         console.error(error)
       }
     },
-    async handleAddToFirebase(purchasePlanText: String): Promise<void> {
+    async handleAddToFirebase(purchasePlanText: string): Promise<void> {
       try {
         const data: FormatedList = {
           name: this.userName,
