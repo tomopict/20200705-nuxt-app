@@ -12,7 +12,7 @@
       <SingInUser
         :isLogin="isLogin"
         @emitHeaderSignIn="emitHeaderSignIn"
-        @emitHeaderSignOut="emitHeaderSignOur"
+        @emitHeaderSignOut="emitHeaderSignOut"
         :class="'mr-2'"
       ></SingInUser>
       <template v-if="supported">
