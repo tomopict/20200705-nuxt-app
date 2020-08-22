@@ -46,6 +46,8 @@ export default Vue.extend({
   methods: {
     async handleDeletePurchaseData(id: string): Promise<void> {
       const db = await this.$firebase.firestore().collection('shoppinglist')
+      console.log()
+
       db.doc(id)
         .delete()
         .then(() => {
