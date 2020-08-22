@@ -4,12 +4,12 @@
       :user-name="userName"
       :photo-url="photoUrl"
       :supported="isMessagingApiSupported"
-      :isLogin="isLogin"
+      :is-login="isLogin"
       @handleSignIn="handleSignIn"
       @handleSignOut="handleSignOut"
     ></Header>
     <main class="p-2">
-      <DailyLists :daily-lists="dailynecessariesLists"></DailyLists>
+      <DailyLists :daily-lists="dailynecessariesList"></DailyLists>
       <ToDolists
         id="todo-list"
         :lists="shoppingLists"
@@ -47,28 +47,36 @@ import BaseButton from '@/components/atoms/BaseButton.vue'
 import ToDolists from '@/components/molecules/Todolists.vue'
 import DailyLists from '@/components/molecules/DailyLists.vue'
 
+interface DailynecessariesList {
+  label: String
+  lastPurchased?: string
+  purchaseHistory: string | Array<firebase.firestore.FieldValue>
+  status: Boolean
+  value: string
+}
+
 interface FormatedList {
   title: String
-  name: String
-  createdAt: String | firebase.firestore.FieldValue
+  name: string
+  createdAt: string | firebase.firestore.FieldValue
   display: Boolean
-  id?: String
+  id?: string
 }
 
 interface DataType {
-  purchasePlanText: String
+  purchasePlanText: string
   lists: FormatedList[]
   shoppingLists: FormatedList[]
   dailyLists: any
-  userName: String
-  photoUrl: String
-  isLogin: Boolean
-  isMessagingApiSupported: Boolean
+  userName: string
+  photoUrl: string
+  isLogin: boolean
+  isMessagingApiSupported: boolean
 }
 
 type Result = {
   shoppingLists: FormatedList[]
-  dailynecessariesLists: firebase.firestore.DocumentData
+  dailynecessariesList: firebase.firestore.DocumentData
 }
 
 const PLACE_HOLDER_IMAGE_URL = '/placeholder.png'
@@ -107,18 +115,35 @@ export default Vue.extend({
         display: doc.data().display,
         id: doc.id,
       }
-      console.log(doc.data()!.createdAt.toDate())
-
       return formatedList
     })
 
-    const dailynecessariesLists = dailynecessariesSnapshot.docs.map((doc) => {
-      return doc.data()
-    })
+    const dailynecessariesList: DailynecessariesList[] = dailynecessariesSnapshot.docs.map(
+      (doc) => {
+        const LastPurchased: string = app
+          .$dayjs(
+            doc
+              .data()
+              .purchaseHistory.slice(-1)[0]
+              .toDate()
+              .toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })
+          )
+          .format('YYYY/MM/DD HH:mm')
+
+        const formatedList: any = {
+          label: doc.data().label,
+          lastPurchased: LastPurchased,
+          purchaseHistory: doc.data().purchaseHistory,
+          status: doc.data().status,
+          value: doc.data().value,
+        }
+        return formatedList
+      }
+    )
 
     return {
       shoppingLists,
-      dailynecessariesLists,
+      dailynecessariesList,
     }
   },
   data(): DataType {
