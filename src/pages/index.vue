@@ -9,7 +9,7 @@
       @handleSignOut="handleSignOut"
     ></Header>
     <main class="p-2">
-      <DailyList :daily-lists="dailynecessariesList"></DailyList>
+      <DailyList :dailynecessaries-list="dailynecessariesList"></DailyList>
       <ToDolist
         id="todo-list"
         :lists="shoppingLists"
@@ -48,7 +48,6 @@ import ToDolist from '@/components/molecules/TodoList.vue'
 import DailyList from '@/components/molecules/DailyList.vue'
 
 import { DailynecessariesList, FormatedList } from '@/types/struct'
-
 import { dateToStringJa } from '@/utils/filters'
 
 interface DataType {
@@ -79,7 +78,7 @@ export default Vue.extend({
     const shoppingRef = app.$firestore.collection('shoppinglist')
     const dailynecessariesRef = app.$firestore.collection('dailynecessaries')
     const [shoppingSnapshot, dailynecessariesSnapshot] = await Promise.all([
-      shoppingRef.where('display', '==', true).get(),
+      shoppingRef.orderBy('createdAt').where('display', '==', true).get(),
       dailynecessariesRef.get(),
     ])
 

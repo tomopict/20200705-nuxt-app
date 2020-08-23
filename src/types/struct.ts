@@ -1,7 +1,7 @@
 export type DailynecessariesList = {
   label: string
   lastPurchased?: string
-  purchaseHistory: string | Array<firebase.firestore.FieldValue>
+  purchaseHistory: string | Array<firebase.firestore.Timestamp>
   status: boolean
   value: string
 }

@@ -26,23 +26,12 @@
 
 <script lang="ts">
 import Vue from 'vue'
-
-interface PurchasedAt {
-  nanoseconds: number
-  seconds: number
-}
-interface DailyLists {
-  label: string
-  lastPurchased: string
-  purchaseHistory: Array<PurchasedAt>
-  status: boolean
-  value: string
-}
+import { DailynecessariesList } from '@/types/struct'
 
 export default Vue.extend({
   props: {
     dailynecessariesList: {
-      type: Array as () => DailyLists[],
+      type: Array as () => DailynecessariesList[],
       required: false,
     },
   },
