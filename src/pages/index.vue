@@ -47,23 +47,9 @@ import BaseButton from '@/components/atoms/BaseButton.vue'
 import ToDolist from '@/components/molecules/TodoList.vue'
 import DailyList from '@/components/molecules/DailyList.vue'
 
+import { DailynecessariesList, FormatedList } from '@/types/struct'
+
 import { dateToStringJa } from '@/utils/filters'
-
-interface DailynecessariesList {
-  label: string
-  lastPurchased?: string
-  purchaseHistory: string | Array<firebase.firestore.FieldValue>
-  status: boolean
-  value: string
-}
-
-interface FormatedList {
-  title: string
-  name: string
-  createdAt: string | firebase.firestore.FieldValue
-  display: boolean
-  id?: string
-}
 
 interface DataType {
   purchasePlanText: string
