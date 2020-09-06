@@ -28,12 +28,14 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { FormatedList } from '@/types/struct'
 
 export default Vue.extend({
   props: {
     lists: {
-      type: Array,
-      required: false,
+      type: Array as () => FormatedList[],
+      default: (): [] => [],
+      required: true,
     },
   },
   data(): {
@@ -46,7 +48,6 @@ export default Vue.extend({
   methods: {
     async handleDeletePurchaseData(id: string): Promise<void> {
       const db = await this.$firebase.firestore().collection('shoppinglist')
-      console.log()
 
       db.doc(id)
         .delete()
