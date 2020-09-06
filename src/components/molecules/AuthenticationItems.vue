@@ -21,6 +21,13 @@
 import Vue from 'vue'
 
 export default Vue.extend({
+  props: {
+    userName: {
+      type: String,
+      default: '名無し',
+      required: true,
+    },
+  },
   data(): {
     textInstanceIdToken: string
   } {
