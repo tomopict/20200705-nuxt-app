@@ -9,7 +9,7 @@
       @handleSignOut="handleSignOut"
     ></Header>
     <main class="p-2">
-      <DailyList :dailynecessaries-list="dailynecessariesList"></DailyList>
+      <DailyList :dailynecessaries-list="dailynecessariesList" />
       <ToDolist
         id="todo-list"
         :lists="shoppingLists"
@@ -82,10 +82,6 @@ export default Vue.extend({
       dailynecessariesRef.get(),
     ])
 
-    /** TODO
-     * orderbyするためにindexをはる
-     * https://ginpen.com/2019/06/01/firestore-indexes-json/
-     */
     const shoppingLists = shoppingSnapshot.docs.map((doc) => {
       const formatedList: FormatedList = {
         title: doc.data().title,

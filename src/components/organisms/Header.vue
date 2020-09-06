@@ -10,13 +10,13 @@
     </ul>
     <dir class="flex">
       <SingInUser
-        :isLogin="isLogin"
+        :is-login="isLogin"
+        :class="'mr-2'"
         @emitHeaderSignIn="emitHeaderSignIn"
         @emitHeaderSignOut="emitHeaderSignOut"
-        :class="'mr-2'"
       ></SingInUser>
       <template v-if="supported">
-        <AuthenticationItems :user-name="userName"></AuthenticationItems>
+        <AuthenticationItems :user-name="userName" />
       </template>
     </dir>
   </header>
