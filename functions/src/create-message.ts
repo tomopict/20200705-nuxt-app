@@ -18,9 +18,9 @@ const sendPushNotification = function (
 ) {
   const payload = {
     notification: {
-      title: title,
-      body: body,
-      badge: badge,
+      title,
+      body,
+      badge,
       sound: 'default',
     },
   }
@@ -76,7 +76,7 @@ export const createMessage = functions
         if (doc.exists === true) {
           // 受信者の情報を取得(name,fcmToken)
           const receiver = doc.data()
-          const fcmToken = receiver['fcmToken']
+          const fcmToken = receiver.fcmToken
 
           // 通知のタイトル
           const title = `${senderName}`
@@ -85,14 +85,14 @@ export const createMessage = functions
           sendPushNotification(fcmToken, title, body, '1')
           console.log('newMessage')
 
-          const message_to_line = {
+          const messageToLine = {
             type: 'text',
             text: `${content}`,
           }
 
           // https://line.github.io/line-bot-sdk-nodejs/api-reference/client.html#methods
           client
-            .broadcast(message_to_line)
+            .broadcast(messageToLine)
             .then((res: any) => {
               console.log('line send OK', res)
             })
