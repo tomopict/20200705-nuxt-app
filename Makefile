@@ -2,6 +2,7 @@ hosting:
 	rm -rf ./public/
 	rm -rf ./functions/ssr/dist/
 	mkdir -p ./public/
+	mkdir -p ./functions/ssr/dist/
 	cp -r ./.nuxt/dist/ ./functions/ssr/dist/
 	cp -r ./src/static/ ./public/
 	firebase deploy --only hosting

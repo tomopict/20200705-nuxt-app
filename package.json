@@ -19,7 +19,9 @@
     "fire:exec": "firebase experimental:functions:shell"
   },
   "lint-staged": {
-    "*.{js,vue}": "eslint",
+    "*.{js,vue}": [
+      "eslint --fix"
+    ],
     "*.{css,vue}": "stylelint"
   },
   "husky": {

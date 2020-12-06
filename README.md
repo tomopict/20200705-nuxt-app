@@ -19,6 +19,15 @@ $ yarn generate
 # run on docker
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 
+# deploy
+makeを利用してデプロイ
+$ make build
+hostingとfunctionsの両方が走っている
+個別でデプロイしたい場合は
+make hostingを行う
+
+# localでのシュミレート
+
+
 ```
 
-For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).

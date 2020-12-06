@@ -23,7 +23,7 @@
           v-model="purchasePlanText"
           class="input-text p-1 border-gray-700 border-radius"
           type="text"
-          placeholder="買いたいものを入れてよ"
+          placeholder="買いたいものを入れてよね"
         />
         <BaseButton
           :style="{
