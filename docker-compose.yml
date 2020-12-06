@@ -1,12 +1,27 @@
 version: '3'
+
 services:
   nuxt:
-    image: node:12.16.0
-    working_dir: /var/local/app
+    container_name: shopping-list
+
+    # Dockerfileの場所
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    tty: true
+    stdin_open: true
+
+    # コンテナ起動時のコマンド
+    # 初回起動時は時間がかかる
+    working_dir: /app
+    
+    # ホストOSとコンテナ内でソースコードを共有
+    # node_modulesは除外
     volumes:
-      - .:/var/local/app:cached
-    environment:
-      - HOST=0.0.0.0
+      - .:/app
+      - /app/node_modules
+    # コンテナ内部3000を外部から4000でアクセス
+
     ports:
-      - 8080:3000
-    container_name: nuxt-app-test
+      - "4000:3000"
+    command: yarn dev

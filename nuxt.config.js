@@ -46,4 +46,5 @@ export default {
   manifest: {
     gcm_sender_id: '505789450982',
   },
+  telemetry: false,
 }
