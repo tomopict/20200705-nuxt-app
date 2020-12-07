@@ -15,6 +15,11 @@ export default {
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
+  server: {
+    port: process.env.PORT || 3000,
+    host: '0.0.0.0',
+    timing: false,
+  },
   css: [],
   plugins: ['~/plugins/firebase'],
   components: true,
