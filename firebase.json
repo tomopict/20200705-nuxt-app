@@ -9,12 +9,13 @@
   "hosting": {
     "public": "public",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "rewrites": [
-      {
-        "source": "**",
-        "function": "ssr"
+    "rewrites": [ {
+      "source": "**",
+      "run": {
+        "serviceId": "shopping-list",
+        "region": "asia-northeast1"
       }
-    ]
+    } ]
   },
   "storage": {
     "rules": "storage.rules"
