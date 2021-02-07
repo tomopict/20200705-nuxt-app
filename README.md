@@ -1,4 +1,6 @@
-# 20200705-nuxt-app
+# お買い物リスト
+
+買い物で必要なものをlineおよびHP上から登録ができるアプリケーション。
 
 ## Build Setup
 
@@ -24,10 +26,13 @@ makeを利用してデプロイ
 $ make build
 hostingとfunctionsの両方が走っている
 個別でデプロイしたい場合は
-make hostingを行う
+
+```
+make hosting
+```
+
+を行う
 
 # localでのシュミレート
 
-
-```
 
