@@ -1,5 +1,5 @@
 <template>
-  <ul>
+  <ul class="pb-16">
     <li
       v-for="list in lists"
       :key="list.id"
